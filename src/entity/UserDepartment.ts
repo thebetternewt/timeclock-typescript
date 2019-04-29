@@ -4,6 +4,7 @@ import {
   PrimaryColumn,
   JoinColumn,
   ManyToOne,
+  Column,
 } from 'typeorm';
 import { User } from './User';
 import { Department } from './Department';
@@ -14,13 +15,16 @@ export class UserDepartment extends BaseEntity {
   userId: string;
 
   @PrimaryColumn()
-  departmentId: string;
+  deptId: string;
+
+  @Column({ default: false })
+  supervisor: boolean;
 
   @ManyToOne(() => User, user => user.departmentConnection)
   @JoinColumn({ name: 'userId' })
   user: Promise<User>;
 
   @ManyToOne(() => Department, dept => dept.userConnection, { primary: true })
-  @JoinColumn({ name: 'departmentId' })
+  @JoinColumn({ name: 'deptId' })
   department: Promise<Department>;
 }

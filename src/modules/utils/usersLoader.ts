@@ -5,6 +5,8 @@ import { User } from '../../entity/User';
 import { UserDepartment } from '../../entity/UserDepartment';
 
 const batchUsers = async (departmentIds: string[]) => {
+  // Inner Join User and Department tables and select were department Id is
+  // in list of department Ids.
   const userDepartments = await UserDepartment.find({
     join: {
       alias: 'userDepartment',
@@ -17,25 +19,30 @@ const batchUsers = async (departmentIds: string[]) => {
     },
   });
 
-  console.log('userDepartments:', userDepartments);
-
-  const departmentIdToUsers: { [key: string]: User[] } = {};
+  const deptIdToUsers: { [key: string]: User[] } = {};
 
   /*
+  ==> Data looks like this:
+
   {
     userId: 'fdsa',
     departmentId: 'asdf',
-    __user__: { id: 'fdsa', name: 'Test User' }
+    __user__: { id: 'fdsa', netId: 'tt123', ... }
   }
   */
 
-  // userDepartments.forEach(du => {
-  //   if (du.departmentId in departmentIdToUsers) {
-  //     departmentIdToUsers[du.departmentId].push();
-  //   }
-  // })
+  // Loop through the results and add them to the map.
+  userDepartments.forEach(du => {
+    if (du.deptId in deptIdToUsers) {
+      deptIdToUsers[du.deptId].push((du as any).__user__);
+    } else {
+      deptIdToUsers[du.deptId] = [(du as any).__user__];
+    }
+  });
 
-  return departmentIds.map(deptId => departmentIdToUsers[deptId]);
+  // console.log('userDepartments:', userDepartments);
+
+  return departmentIds.map(deptId => deptIdToUsers[deptId]);
 };
 
 export const createUsersLoader = () => new DataLoader(batchUsers);
