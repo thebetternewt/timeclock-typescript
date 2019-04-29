@@ -1,31 +1,31 @@
-import { ApolloServer } from 'apollo-server-express'
-import Express from 'express'
-import session from 'express-session'
-import connectRedis from 'connect-redis'
-import { createConnection } from 'typeorm'
+import { ApolloServer } from 'apollo-server-express';
+import Express from 'express';
+import session from 'express-session';
+import connectRedis from 'connect-redis';
+import { createConnection } from 'typeorm';
 
-import { createSchema } from './modules/utils/createSchema'
-import { redis } from './redis'
-import { SESS_NAME, SESS_SECRET, SESS_LIFETIME, IN_PROD } from './config'
+import { createSchema } from './modules/utils/createSchema';
+import { redis } from './redis';
+import { SESS_NAME, SESS_SECRET, SESS_LIFETIME, IN_PROD } from './config';
 
 const main = async () => {
-  await createConnection()
+  await createConnection();
 
-  const schema = await createSchema()
+  const schema = await createSchema();
 
   const apolloServer = new ApolloServer({
     schema,
     context: ({ req, res }: any) => ({ req, res }),
-  })
+  });
 
-  const app = Express()
+  const app = Express();
 
   const corsOptions = {
     credentials: true,
     origin: 'http://localhost:3000',
-  }
+  };
 
-  const RedisStore = connectRedis(session)
+  const RedisStore = connectRedis(session);
 
   app.use(
     session({
@@ -42,14 +42,14 @@ const main = async () => {
         maxAge: parseInt(SESS_LIFETIME as string, 10),
       },
     } as any)
-  )
+  );
 
-  apolloServer.applyMiddleware({ app, cors: corsOptions })
-  apolloServer.applyMiddleware({ app })
+  apolloServer.applyMiddleware({ app, cors: corsOptions });
+  apolloServer.applyMiddleware({ app });
 
   app.listen(4000, () => {
-    console.log(`Server listening on http://localhost:4000/graphql`)
-  })
-}
+    console.log(`Server listening on http://localhost:4000/graphql`);
+  });
+};
 
-main()
+main();

@@ -6,10 +6,10 @@ import { AuthenticationError } from 'apollo-server-core';
 import { isCurrentUser } from '../utils/isCurrentUser';
 
 @Resolver()
-export class MakeAdminResolver {
+export class RemoveAdminResolver {
   @UseMiddleware(isAdmin)
   @Mutation(() => Boolean)
-  async makeAdmin(
+  async removeAdmin(
     @Arg('netId') netId: string,
     @Ctx() ctx: MyContext
   ): Promise<boolean> {
@@ -26,7 +26,7 @@ export class MakeAdminResolver {
       throw new AuthenticationError('Not authorized!');
     }
 
-    user.admin = true;
+    user.admin = false;
 
     await user.save();
 

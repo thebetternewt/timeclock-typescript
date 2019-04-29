@@ -1,15 +1,15 @@
 import { Resolver, Mutation, UseMiddleware, Arg, Ctx } from 'type-graphql';
 import { isAdmin } from '../middleware/isAdmin';
 import { User } from '../../entity/User';
-import { MyContext } from '../../types/MyContext';
-import { AuthenticationError } from 'apollo-server-core';
+import { ForbiddenError } from 'apollo-server-core';
 import { isCurrentUser } from '../utils/isCurrentUser';
+import { MyContext } from '../../types/MyContext';
 
 @Resolver()
-export class MakeAdminResolver {
+export class DeactivateUserResolver {
   @UseMiddleware(isAdmin)
   @Mutation(() => Boolean)
-  async makeAdmin(
+  async deactivateUser(
     @Arg('netId') netId: string,
     @Ctx() ctx: MyContext
   ): Promise<boolean> {
@@ -21,12 +21,12 @@ export class MakeAdminResolver {
     }
 
     // Throw error if user is logged in user. Logged in users cannot edit
-    // their own admin status.
+    // their own active status.
     if (isCurrentUser(ctx, user)) {
-      throw new AuthenticationError('Not authorized!');
+      throw new ForbiddenError('Not authorized!');
     }
 
-    user.admin = true;
+    user.active = false;
 
     await user.save();
 

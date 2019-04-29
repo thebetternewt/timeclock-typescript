@@ -57,4 +57,10 @@ export class User extends BaseEntity {
   async hashPassword() {
     this.password = await hash(this.password, 12)
   }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async lowercaseEmail() {
+    this.email = this.email.toLowerCase()
+  }
 }
