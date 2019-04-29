@@ -7,6 +7,7 @@ import { createConnection } from 'typeorm';
 import { createSchema } from './modules/utils/createSchema';
 import { redis } from './redis';
 import { SESS_NAME, SESS_SECRET, SESS_LIFETIME, IN_PROD } from './config';
+import { createUsersLoader } from './modules/utils/usersLoader';
 
 const main = async () => {
   await createConnection();
@@ -15,7 +16,11 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema,
-    context: ({ req, res }: any) => ({ req, res }),
+    context: ({ req, res }: any) => ({
+      req,
+      res,
+      usersLoader: createUsersLoader(),
+    }),
   });
 
   const app = Express();

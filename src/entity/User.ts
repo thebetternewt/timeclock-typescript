@@ -5,62 +5,67 @@ import {
   PrimaryGeneratedColumn,
   BeforeInsert,
   BeforeUpdate,
-} from 'typeorm'
-import { ObjectType, Field, ID, Root } from 'type-graphql'
-import { hash } from 'bcryptjs'
+  OneToMany,
+} from 'typeorm';
+import { ObjectType, Field, ID, Root } from 'type-graphql';
+import { hash } from 'bcryptjs';
+import { UserDepartment } from './UserDepartment';
 
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id: string;
 
   @Field()
   @Column({ unique: true })
-  netId: string
+  netId: string;
 
   @Field()
   @Column({ unique: true })
-  nineDigitId: string
+  nineDigitId: string;
 
   @Field()
   @Column()
-  firstName: string
+  firstName: string;
 
   @Field()
   @Column()
-  lastName: string
+  lastName: string;
 
-  @Field({ complexity: 3 })
+  @Field()
   name(@Root() parent: User): string {
-    return `${parent.firstName} ${parent.lastName}`
+    return `${parent.firstName} ${parent.lastName}`;
   }
 
   @Field()
   @Column({ default: false })
-  admin: boolean
+  admin: boolean;
 
   @Field()
   @Column({ default: true })
-  active: boolean
+  active: boolean;
 
   @Field()
   @Column('text', { unique: true })
-  email: string
+  email: string;
 
   @Column()
-  password: string
+  password: string;
 
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    this.password = await hash(this.password, 12)
+    this.password = await hash(this.password, 12);
   }
 
   @BeforeInsert()
   @BeforeUpdate()
   async lowercaseEmail() {
-    this.email = this.email.toLowerCase()
+    this.email = this.email.toLowerCase();
   }
+
+  @OneToMany(() => UserDepartment, ud => ud.user)
+  departmentConnection: Promise<UserDepartment[]>;
 }
