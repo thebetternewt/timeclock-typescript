@@ -7,9 +7,11 @@ import {
   BeforeUpdate,
   OneToMany,
 } from 'typeorm';
-import { ObjectType, Field, ID, Root } from 'type-graphql';
+import { ObjectType, Field, ID, Root, Ctx } from 'type-graphql';
 import { hash } from 'bcryptjs';
 import { UserDepartment } from './UserDepartment';
+import { Department } from './Department';
+import { MyContext } from '../types/MyContext';
 
 @ObjectType()
 @Entity()
@@ -68,4 +70,20 @@ export class User extends BaseEntity {
 
   @OneToMany(() => UserDepartment, ud => ud.user)
   departmentConnection: Promise<UserDepartment[]>;
+
+  @Field(() => [Department], { defaultValue: [] })
+  async departments(@Ctx()
+  {
+    departmentsLoader,
+  }: MyContext): Promise<Department[]> {
+    return departmentsLoader.load(this.id);
+  }
+
+  @Field(() => [Department], { defaultValue: [] })
+  async supervisedDepartments(@Ctx()
+  {
+    supervisedDepartmentsLoader,
+  }: MyContext): Promise<Department[]> {
+    return supervisedDepartmentsLoader.load(this.id);
+  }
 }

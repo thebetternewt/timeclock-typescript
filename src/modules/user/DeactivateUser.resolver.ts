@@ -30,6 +30,8 @@ export class DeactivateUserResolver {
 
     await user.save();
 
+    // ! TODO: Kill user session if logged in.
+
     return true;
   }
 }

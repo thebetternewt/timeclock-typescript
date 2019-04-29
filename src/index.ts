@@ -8,6 +8,9 @@ import { createSchema } from './modules/utils/createSchema';
 import { redis } from './redis';
 import { SESS_NAME, SESS_SECRET, SESS_LIFETIME, IN_PROD } from './config';
 import { createUsersLoader } from './modules/utils/usersLoader';
+import { createSupervisorsLoader } from './modules/utils/supervisorsLoader';
+import { createSupervisedDepartmentsLoader } from './modules/utils/supervisedDepartmentsLoader';
+import { createDepartmentsLoader } from './modules/utils/departmentsLoader';
 
 const main = async () => {
   await createConnection();
@@ -20,6 +23,9 @@ const main = async () => {
       req,
       res,
       usersLoader: createUsersLoader(),
+      supervisorsLoader: createSupervisorsLoader(),
+      departmentsLoader: createDepartmentsLoader(),
+      supervisedDepartmentsLoader: createSupervisedDepartmentsLoader(),
     }),
   });
 

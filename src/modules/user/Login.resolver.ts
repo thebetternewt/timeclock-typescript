@@ -14,10 +14,19 @@ export class LoginResolver {
   ): Promise<User | null> {
     const user = await User.findOne({ netId });
 
+    // Check if user exists.
     if (!user) {
       throw new AuthenticationError('Invalid login credentials.');
     }
 
+    // Check if user is active.
+    if (!user.active) {
+      throw new AuthenticationError(
+        'Your account is inactive. Please contact your system administrator'
+      );
+    }
+
+    // Validate password
     const valid = await compare(password, user.password);
 
     if (!valid) {

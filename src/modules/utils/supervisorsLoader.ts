@@ -6,7 +6,7 @@ import { UserDepartment } from '../../entity/UserDepartment';
 
 const batchUsers = async (departmentIds: string[]) => {
   // Inner Join User and Department tables and select were department Id is
-  // in list of department Ids.
+  // in list of department Ids and user is supervisor.
   const userDepartments = await UserDepartment.find({
     join: {
       alias: 'userDepartment',
@@ -16,6 +16,7 @@ const batchUsers = async (departmentIds: string[]) => {
     },
     where: {
       deptId: In(departmentIds),
+      supervisor: true,
     },
   });
 
@@ -45,4 +46,4 @@ const batchUsers = async (departmentIds: string[]) => {
   return departmentIds.map(deptId => deptIdToUsers[deptId]);
 };
 
-export const createUsersLoader = () => new DataLoader(batchUsers);
+export const createSupervisorsLoader = () => new DataLoader(batchUsers);

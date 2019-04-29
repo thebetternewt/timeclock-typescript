@@ -29,4 +29,9 @@ export class Department extends BaseEntity {
   async users(@Ctx() { usersLoader }: MyContext): Promise<User[]> {
     return usersLoader.load(this.id);
   }
+
+  @Field(() => [User], { defaultValue: [] })
+  async supervisors(@Ctx() { supervisorsLoader }: MyContext): Promise<User[]> {
+    return supervisorsLoader.load(this.id);
+  }
 }
