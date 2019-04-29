@@ -10,6 +10,7 @@ import { ObjectType, Field, ID, Ctx } from 'type-graphql';
 import { User } from './User';
 import { UserDepartment } from './UserDepartment';
 import { MyContext } from '../types/MyContext';
+import { Shift } from './Shift';
 
 @ObjectType()
 @Entity()
@@ -34,4 +35,7 @@ export class Department extends BaseEntity {
   async supervisors(@Ctx() { supervisorsLoader }: MyContext): Promise<User[]> {
     return supervisorsLoader.load(this.id);
   }
+
+  @OneToMany(() => Shift, shift => shift.department)
+  shiftConnection: Promise<Shift[]>;
 }

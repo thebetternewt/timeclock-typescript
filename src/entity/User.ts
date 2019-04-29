@@ -12,6 +12,7 @@ import { hash } from 'bcryptjs';
 import { UserDepartment } from './UserDepartment';
 import { Department } from './Department';
 import { MyContext } from '../types/MyContext';
+import { Shift } from './Shift';
 
 @ObjectType()
 @Entity()
@@ -85,5 +86,13 @@ export class User extends BaseEntity {
     supervisedDepartmentsLoader,
   }: MyContext): Promise<Department[]> {
     return supervisedDepartmentsLoader.load(this.id);
+  }
+
+  @OneToMany(() => Shift, shift => shift.user)
+  shiftConnection: Promise<Shift[]>;
+
+  @Field(() => [Shift], { defaultValue: [] })
+  async shifts(@Root() parent: User) {
+    return Shift.find({ userId: parent.id });
   }
 }
