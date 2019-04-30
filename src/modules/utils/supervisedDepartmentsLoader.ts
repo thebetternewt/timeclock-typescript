@@ -41,7 +41,7 @@ const batchDepartments = async (userIds: string[]) => {
     }
   });
 
-  console.log('userDepartments:', userDepartments);
+  // console.log('userDepartments:', userDepartments);
 
   return userIds.map(userId => userIdToDeptIds[userId]);
 };

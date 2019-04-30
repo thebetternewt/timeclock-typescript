@@ -4,7 +4,7 @@ import { In } from 'typeorm';
 import { User } from '../../entity/User';
 import { UserDepartment } from '../../entity/UserDepartment';
 
-// ! TODO: Figure this shifts load out.
+// TODO: Figure this shifts load out.
 
 const batchUsers = async (departmentIds: string[]) => {
   // Inner Join User and Department tables and select were department Id is

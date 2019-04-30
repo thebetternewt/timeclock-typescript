@@ -2,8 +2,6 @@ import { Resolver, UseMiddleware, Query, Arg } from 'type-graphql';
 import { isAuth } from '../middleware/isAuth';
 import { Department } from '../../entity/Department';
 
-// ! TODO: Restrict to admins and those departments user is supervising.
-
 @Resolver()
 export class DepartmentsResolver {
   @UseMiddleware(isAuth)

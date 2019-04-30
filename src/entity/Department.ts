@@ -5,12 +5,13 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
 } from 'typeorm';
-import { ObjectType, Field, ID, Ctx } from 'type-graphql';
+import { ObjectType, Field, ID, Ctx, Root } from 'type-graphql';
 
+import { MyContext } from '../types/MyContext';
 import { User } from './User';
 import { UserDepartment } from './UserDepartment';
-import { MyContext } from '../types/MyContext';
 import { Shift } from './Shift';
+import { isSupervisor } from '../modules/utils/isSupervisor';
 
 @ObjectType()
 @Entity()
@@ -27,8 +28,16 @@ export class Department extends BaseEntity {
   userConnection: Promise<UserDepartment[]>;
 
   @Field(() => [User])
-  async users(@Ctx() { usersLoader }: MyContext): Promise<User[]> {
-    return usersLoader.load(this.id);
+  async users(
+    @Root() parent: Department,
+    @Ctx() ctx: MyContext
+  ): Promise<User[] | null> {
+    // Check if user is supervisor before returning list of users.
+    if (await isSupervisor(ctx, parent.id)) {
+      return ctx.usersLoader.load(this.id);
+    }
+
+    return [];
   }
 
   @Field(() => [User], { defaultValue: [] })
@@ -38,4 +47,17 @@ export class Department extends BaseEntity {
 
   @OneToMany(() => Shift, shift => shift.department)
   shiftConnection: Promise<Shift[]>;
+
+  @Field(() => [Shift], { defaultValue: [] })
+  async shifts(
+    @Root() parent: Department,
+    @Ctx() ctx: MyContext
+  ): Promise<Shift[] | null> {
+    // Check if user is supervisor before returning list of shifts.
+    if (await isSupervisor(ctx, parent.id)) {
+      return Shift.find({ deptId: parent.id });
+    }
+
+    return [];
+  }
 }
