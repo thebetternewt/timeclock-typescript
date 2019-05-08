@@ -6,6 +6,7 @@ import {
   BeforeInsert,
   BeforeUpdate,
   OneToMany,
+  IsNull,
 } from 'typeorm';
 import { ObjectType, Field, ID, Root, Ctx } from 'type-graphql';
 import { hash } from 'bcryptjs';
@@ -56,6 +57,12 @@ export class User extends BaseEntity {
 
   @Column()
   password: string;
+
+  @Field(() => Boolean)
+  async isClockedIn(@Root() parent: User): Promise<boolean> {
+    const shift = await Shift.findOne({ userId: parent.id, timeOut: IsNull() });
+    return !!shift;
+  }
 
   @BeforeInsert()
   @BeforeUpdate()
