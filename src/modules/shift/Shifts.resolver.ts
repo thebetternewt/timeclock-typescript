@@ -8,7 +8,7 @@ import { Resolver, Query, UseMiddleware, Arg, Mutation } from 'type-graphql';
 
 import { isAdmin } from '../middleware/isAdmin';
 import { Shift } from '../../entity/Shift';
-import { ShiftInput } from './shift/ShiftInput';
+import { ShiftInput } from './shifts/ShiftInput';
 import { UserInputError } from 'apollo-server-core';
 
 @Resolver()

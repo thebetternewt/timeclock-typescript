@@ -58,6 +58,11 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
+  @Field(() => Shift, { nullable: true })
+  async lastShift(@Root() parent: User): Promise<Shift | undefined> {
+    return Shift.findOne({ userId: parent.id }, { order: { timeIn: 'DESC' } });
+  }
+
   @Field(() => Boolean)
   async isClockedIn(@Root() parent: User): Promise<boolean> {
     const shift = await Shift.findOne({ userId: parent.id, timeOut: IsNull() });
