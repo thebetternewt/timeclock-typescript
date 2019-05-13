@@ -1,8 +1,10 @@
 import { Resolver, UseMiddleware, Query, Arg } from 'type-graphql';
+import { MoreThanOrEqual, FindOperator, LessThanOrEqual } from 'typeorm';
+import moment = require('moment');
+
 import { isAuth } from '../middleware/isAuth';
 import { PayPeriod, SemesterType } from '../../entity/PayPeriod';
 import { SearchPayPeriodsInput } from './searchPayPeriods/SearchPayPeriodsInput';
-import { MoreThanOrEqual, FindOperator, LessThanOrEqual } from 'typeorm';
 
 @Resolver()
 export class PayPeriodsResolver {
@@ -56,11 +58,28 @@ export class PayPeriodsResolver {
 @Resolver()
 export class PayPeriodResolver {
   @UseMiddleware(isAuth)
-  @Query(() => PayPeriod, { nullable: true })
+  @Query(() => PayPeriod, {
+    nullable: true,
+    description:
+      'Returns a single pay period based on the id, then date. Returns the current pay period if no params specified.',
+  })
   async payPeriod(
-    @Arg('payPeriodId') deptId: string
+    @Arg('id', { nullable: true }) id: string,
+    @Arg('date', { nullable: true, description: 'Date ISO String.' })
+    date: string
   ): Promise<PayPeriod | undefined> {
-    // TODO: Search by date
-    return PayPeriod.findOne({ id: deptId });
+    if (id) {
+      return PayPeriod.findOne({ id });
+    } else if (date) {
+      return PayPeriod.findOne({
+        startDate: LessThanOrEqual(date),
+        endDate: MoreThanOrEqual(date),
+      });
+    } else {
+      return PayPeriod.findOne({
+        startDate: LessThanOrEqual(moment().toISOString()),
+        endDate: MoreThanOrEqual(moment().toISOString()),
+      });
+    }
   }
 }
