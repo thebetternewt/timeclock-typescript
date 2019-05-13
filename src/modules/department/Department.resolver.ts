@@ -1,8 +1,8 @@
-import { Resolver, UseMiddleware, Query, Arg } from 'type-graphql';
+import { Resolver, UseMiddleware, Query, Arg, ID } from 'type-graphql';
 import { isAuth } from '../middleware/isAuth';
 import { Department } from '../../entity/Department';
 
-@Resolver()
+@Resolver(() => Department)
 export class DepartmentsResolver {
   @UseMiddleware(isAuth)
   @Query(() => [Department])
@@ -11,12 +11,12 @@ export class DepartmentsResolver {
   }
 }
 
-@Resolver()
+@Resolver(() => Department)
 export class DepartmentResolver {
   @UseMiddleware(isAuth)
   @Query(() => Department, { nullable: true })
   async department(
-    @Arg('departmentId') deptId: string
+    @Arg('id', () => ID) deptId: string
   ): Promise<Department | undefined> {
     return Department.findOne({ id: deptId });
   }
