@@ -89,7 +89,8 @@ export class User extends BaseEntity {
   {
     departmentsLoader,
   }: MyContext): Promise<Department[]> {
-    return departmentsLoader.load(this.id);
+    const departments = await departmentsLoader.load(this.id);
+    return departments || [];
   }
 
   @Field(() => [Department], { defaultValue: [] })
@@ -97,7 +98,8 @@ export class User extends BaseEntity {
   {
     supervisedDepartmentsLoader,
   }: MyContext): Promise<Department[]> {
-    return supervisedDepartmentsLoader.load(this.id);
+    const departments = await supervisedDepartmentsLoader.load(this.id);
+    return departments || [];
   }
 
   @OneToMany(() => Shift, shift => shift.user)

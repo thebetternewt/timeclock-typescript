@@ -4,6 +4,7 @@ import { Department } from '../../entity/Department';
 import { DepartmentInput } from './createDepartment/DepartmentInput';
 import { UserInputError } from 'apollo-server-core';
 
+
 @Resolver()
 export class CreateDepartmentResolver {
   @Mutation(() => Department)

@@ -34,15 +34,17 @@ export class Department extends BaseEntity {
   ): Promise<User[] | null> {
     // Check if user is supervisor before returning list of users.
     if (await isSupervisor(ctx, parent.id)) {
-      return ctx.usersLoader.load(this.id);
+      const users = (await ctx.usersLoader.load(this.id)) || [];
+      return users;
     }
 
     return [];
   }
 
-  @Field(() => [User], { defaultValue: [] })
+  @Field(() => [User])
   async supervisors(@Ctx() { supervisorsLoader }: MyContext): Promise<User[]> {
-    return supervisorsLoader.load(this.id);
+    const supervisors = (await supervisorsLoader.load(this.id)) || [];
+    return supervisors;
   }
 
   @OneToMany(() => Shift, shift => shift.department)

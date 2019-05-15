@@ -20,6 +20,8 @@ const batchUsers = async (departmentIds: string[]) => {
     },
   });
 
+  console.log('userDepartments:', userDepartments);
+
   const deptIdToUsers: { [key: string]: User[] } = {};
 
   /*
@@ -41,7 +43,7 @@ const batchUsers = async (departmentIds: string[]) => {
     }
   });
 
-  // console.log('userDepartments:', userDepartments);
+  console.log('userDepartments:', userDepartments);
 
   return departmentIds.map(deptId => deptIdToUsers[deptId]);
 };

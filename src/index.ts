@@ -4,6 +4,8 @@ import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { createConnection } from 'typeorm';
 
+
+
 import { createSchema } from './modules/utils/createSchema';
 import { redis } from './redis';
 import { SESS_NAME, SESS_SECRET, SESS_LIFETIME, IN_PROD } from './config';
@@ -33,7 +35,7 @@ const main = async () => {
 
   const corsOptions = {
     credentials: true,
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://dev.relatemediadesign.com:3000'],
   };
 
   const RedisStore = connectRedis(session);
@@ -50,15 +52,15 @@ const main = async () => {
       cookie: {
         httpOnly: true,
         secure: IN_PROD,
-        maxAge: parseInt(SESS_LIFETIME as string, 10),
+        maxAge: +SESS_LIFETIME,
       },
-    } as any)
+    })
   );
 
   apolloServer.applyMiddleware({ app, cors: corsOptions });
   apolloServer.applyMiddleware({ app });
 
-  app.listen(4000, () => {
+  return app.listen(4000, () => {
     console.log(`Server listening on http://localhost:4000/graphql`);
   });
 };
