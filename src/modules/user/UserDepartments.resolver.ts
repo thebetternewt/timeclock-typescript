@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Arg, UseMiddleware } from 'type-graphql';
+import { Resolver, Mutation, Arg, UseMiddleware, ID } from 'type-graphql';
 import { UserInputError } from 'apollo-server-core';
 
 import { Department } from '../../entity/Department';
@@ -9,11 +9,11 @@ import { isAdmin } from '../middleware/isAdmin';
 
 @Resolver()
 export class AddToDepartmentResolver {
-  @UseMiddleware(isAuth, isAdmin)
+  @UseMiddleware(isAdmin)
   @Mutation(() => Boolean)
   async addToDepartment(
-    @Arg('userId') userId: string,
-    @Arg('deptId') deptId: string,
+    @Arg('userId', () => ID) userId: string,
+    @Arg('deptId', () => ID) deptId: string,
     @Arg('supervisor', { nullable: true }) supervisor: boolean
   ): Promise<boolean> {
     // Check if user and department exist.
@@ -34,8 +34,8 @@ export class RemoveFromDepartmentResolver {
   @UseMiddleware(isAuth, isAdmin)
   @Mutation(() => Boolean)
   async removeFromDepartment(
-    @Arg('userId') userId: string,
-    @Arg('deptId') deptId: string
+    @Arg('userId', () => ID) userId: string,
+    @Arg('deptId', () => ID) deptId: string
   ): Promise<boolean> {
     await UserDepartment.delete({ userId, deptId });
 

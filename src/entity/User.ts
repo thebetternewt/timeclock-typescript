@@ -102,7 +102,7 @@ export class User extends BaseEntity {
     return departments || [];
   }
 
-  @OneToMany(() => Shift, shift => shift.user)
+  @OneToMany(() => Shift, (shift: Shift) => shift.user)
   shiftConnection: Promise<Shift[]>;
 
   @Field(() => [Shift], { defaultValue: [] })

@@ -20,11 +20,13 @@ export class UserDepartment extends BaseEntity {
   @Column({ default: false })
   supervisor: boolean;
 
-  @ManyToOne(() => User, user => user.departmentConnection)
+  @ManyToOne(() => User, (user: User) => user.departmentConnection)
   @JoinColumn({ name: 'userId' })
   user: Promise<User>;
 
-  @ManyToOne(() => Department, dept => dept.userConnection, { primary: true })
+  @ManyToOne(() => Department, (dept: Department) => dept.userConnection, {
+    primary: true,
+  })
   @JoinColumn({ name: 'deptId' })
   department: Promise<Department>;
 }

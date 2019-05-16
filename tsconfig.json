@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "lib": ["es2018", "dom"],
+    "lib": ["dom", "es6", "es2018"],
     "sourceMap": true,
     "outDir": "./dist",
     "moduleResolution": "node",
@@ -24,7 +24,8 @@
     "experimentalDecorators": true,
     "skipLibCheck": false,
     "baseUrl": ".",
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": ["node"]
   },
   "exclude": ["node_modules"],
   "include": ["./src/**/*.tsx", "./src/**/*.ts"]

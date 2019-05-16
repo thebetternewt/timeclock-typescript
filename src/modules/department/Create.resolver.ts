@@ -1,9 +1,8 @@
-import { Resolver, Mutation, Arg } from 'type-graphql';
+import { Resolver, Mutation, Arg, ID } from 'type-graphql';
 
 import { Department } from '../../entity/Department';
 import { DepartmentInput } from './createDepartment/DepartmentInput';
 import { UserInputError } from 'apollo-server-core';
-
 
 @Resolver()
 export class CreateDepartmentResolver {
@@ -21,7 +20,7 @@ export class CreateDepartmentResolver {
 export class UpdateDepartmentResolver {
   @Mutation(() => Department)
   async updateDepartment(
-    @Arg('deptId') deptId: string,
+    @Arg('deptId', () => ID) deptId: string,
     @Arg('data') { name }: DepartmentInput
   ): Promise<Department> {
     let department = await Department.findOne(deptId);

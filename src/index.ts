@@ -4,8 +4,6 @@ import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { createConnection } from 'typeorm';
 
-
-
 import { createSchema } from './modules/utils/createSchema';
 import { redis } from './redis';
 import { SESS_NAME, SESS_SECRET, SESS_LIFETIME, IN_PROD } from './config';
@@ -29,6 +27,7 @@ const main = async () => {
       departmentsLoader: createDepartmentsLoader(),
       supervisedDepartmentsLoader: createSupervisedDepartmentsLoader(),
     }),
+    playground: { version: '1.7.25' },
   });
 
   const app = Express();
