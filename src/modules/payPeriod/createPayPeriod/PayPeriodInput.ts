@@ -1,5 +1,5 @@
 import { InputType, Field, ID, Int, registerEnumType } from 'type-graphql';
-import { SemesterType } from 'src/entity/PayPeriod';
+import { SemesterType } from '../../../entity/PayPeriod';
 
 export enum Semester {
   SPRING = 'spring',

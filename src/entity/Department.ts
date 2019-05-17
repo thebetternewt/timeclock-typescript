@@ -12,6 +12,7 @@ import { User } from './User';
 import { UserDepartment } from './UserDepartment';
 import { Shift } from './Shift';
 import { isSupervisor } from '../modules/utils/isSupervisor';
+import { WorkStudy } from './WorkStudy';
 
 @ObjectType()
 @Entity()
@@ -58,6 +59,22 @@ export class Department extends BaseEntity {
     // Check if user is supervisor before returning list of shifts.
     if (await isSupervisor(ctx, parent.id)) {
       return Shift.find({ deptId: parent.id });
+    }
+
+    return [];
+  }
+
+  @OneToMany(() => WorkStudy, ws => ws.department)
+  workStudyConnection: Promise<WorkStudy[]>;
+
+  @Field(() => [WorkStudy], { defaultValue: [] })
+  async workStudy(
+    @Root() parent: Department,
+    @Ctx() ctx: MyContext
+  ): Promise<WorkStudy[] | null> {
+    // Check if user is supervisor before returning list of shifts.
+    if (await isSupervisor(ctx, parent.id)) {
+      return WorkStudy.find({ deptId: parent.id });
     }
 
     return [];

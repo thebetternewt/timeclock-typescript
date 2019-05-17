@@ -2,7 +2,7 @@ import { Resolver, Arg, Mutation, Ctx } from 'type-graphql';
 import { User } from '../../entity/User';
 import { compare } from 'bcryptjs';
 import { AuthenticationError } from 'apollo-server-core';
-import { MyContext } from 'src/types/MyContext';
+import { MyContext } from '../../types/MyContext';
 
 @Resolver()
 export class LoginResolver {

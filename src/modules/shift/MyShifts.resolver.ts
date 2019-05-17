@@ -8,7 +8,7 @@ import { Resolver, Query, UseMiddleware, Arg, Ctx } from 'type-graphql';
 
 import { isAuth } from '../middleware/isAuth';
 import { Shift } from '../../entity/Shift';
-import { MyContext } from 'src/types/MyContext';
+import { MyContext } from '../../types/MyContext';
 
 @Resolver()
 export class MyShiftsResolver {

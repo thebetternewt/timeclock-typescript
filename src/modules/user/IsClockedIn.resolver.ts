@@ -2,7 +2,7 @@ import { Resolver, Ctx, Query, UseMiddleware } from 'type-graphql';
 import { IsNull } from 'typeorm';
 import { User } from '../../entity/User';
 import { Shift } from '../../entity/Shift';
-import { MyContext } from 'src/types/MyContext';
+import { MyContext } from '../../types/MyContext';
 import { isAuth } from '../middleware/isAuth';
 import { logger } from '../middleware/logger';
 

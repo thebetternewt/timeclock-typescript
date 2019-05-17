@@ -14,6 +14,7 @@ import { UserDepartment } from './UserDepartment';
 import { Department } from './Department';
 import { MyContext } from '../types/MyContext';
 import { Shift } from './Shift';
+import { WorkStudy } from './WorkStudy';
 
 @ObjectType()
 @Entity()
@@ -109,4 +110,7 @@ export class User extends BaseEntity {
   async shifts(@Root() parent: User) {
     return Shift.find({ userId: parent.id });
   }
+
+  @OneToMany(() => WorkStudy, (ws: WorkStudy) => ws.user)
+  workStudyConnection: Promise<WorkStudy[]>;
 }

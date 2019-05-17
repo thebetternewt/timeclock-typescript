@@ -6,8 +6,15 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
+  BeforeUpdate,
+  LessThanOrEqual,
+  MoreThanOrEqual,
 } from 'typeorm';
 import { WorkStudyPeriod } from './WorkStudyPeriod';
+import { User } from './User';
+import { Department } from './Department';
+import { UserInputError } from 'apollo-server-core';
 
 @ObjectType()
 @Entity()
@@ -16,11 +23,9 @@ export class WorkStudy extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Field(() => ID)
   @Column()
   userId: string;
 
-  @Field(() => ID)
   @Column()
   deptId: string;
 
@@ -35,6 +40,16 @@ export class WorkStudy extends BaseEntity {
   @Column()
   workStudyPeriodId: string;
 
+  @Field(() => User)
+  @ManyToOne(() => User, (user: User) => user.workStudyConnection)
+  @JoinColumn({ name: 'workStudyId' })
+  user: Promise<User>;
+
+  @Field(() => Department)
+  @ManyToOne(() => Department, (dept: Department) => dept.workStudyConnection)
+  @JoinColumn({ name: 'workStudyId' })
+  department: Promise<Department>;
+
   @Field(() => WorkStudyPeriod)
   @ManyToOne(
     () => WorkStudyPeriod,
@@ -42,4 +57,68 @@ export class WorkStudy extends BaseEntity {
   )
   @JoinColumn({ name: 'workStudyPeriodId' })
   workStudyPeriod: Promise<WorkStudyPeriod>;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async validateDateRange(): Promise<boolean> {
+    const ws = await WorkStudy.findOne({
+      where: [
+        // Start date is not between another period's start and end dates
+        // for a given user & department.
+        {
+          userId: this.userId,
+          deptId: this.deptId,
+          startDate: LessThanOrEqual(this.startDate),
+          endDate: MoreThanOrEqual(this.startDate),
+        },
+        // End date is not between another period's start and end dates
+        // for a given user & department.
+        {
+          userId: this.userId,
+          deptId: this.deptId,
+          startDate: LessThanOrEqual(this.endDate),
+          endDate: MoreThanOrEqual(this.endDate),
+        },
+        // Start and end dates do not completely encapsulate another period
+        // for a given user & department.
+        {
+          userId: this.userId,
+          deptId: this.deptId,
+          startDate: MoreThanOrEqual(this.startDate),
+          endDate: LessThanOrEqual(this.endDate),
+        },
+      ],
+    });
+
+    if (ws && ws.id !== this.id) {
+      throw new UserInputError(
+        'Overlapping period already exists for this user and department.'
+      );
+    }
+
+    // Check if dates are outside of selected work study period.
+    const period = await WorkStudyPeriod.findOne(this.workStudyPeriodId);
+
+    if (!period) {
+      throw new UserInputError('Work study period not found.');
+    }
+
+    if (this.startDate < period.endDate || this.endDate > period.endDate) {
+      throw new UserInputError(
+        'Dates are outside of the selected work study period.'
+      );
+    }
+
+    return true;
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async validateEndDate(): Promise<boolean> {
+    if (this.endDate < this.startDate) {
+      throw new UserInputError('End date must be after start date.');
+    }
+
+    return true;
+  }
 }
