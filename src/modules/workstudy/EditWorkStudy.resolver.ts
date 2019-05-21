@@ -9,7 +9,14 @@ export class EditWorkStudyResolver {
   async editWorkStudy(
     @Arg('id', () => ID) id: string,
     @Arg('data')
-    { userId, deptId, workStudyPeriodId, startDate, endDate }: WorkStudyInput
+    {
+      userId,
+      deptId,
+      workStudyPeriodId,
+      startDate,
+      endDate,
+      amount,
+    }: WorkStudyInput
   ): Promise<WorkStudy> {
     const workStudy = await WorkStudy.findOne(id);
 
@@ -22,6 +29,7 @@ export class EditWorkStudyResolver {
     workStudy.workStudyPeriodId = workStudyPeriodId;
     workStudy.startDate = startDate;
     workStudy.endDate = endDate;
+    workStudy.amount = amount;
 
     await workStudy.save();
 

@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from 'type-graphql';
+import { ObjectType, Field, ID, Int } from 'type-graphql';
 import {
   Entity,
   BaseEntity,
@@ -39,6 +39,10 @@ export class WorkStudy extends BaseEntity {
 
   @Column()
   workStudyPeriodId: string;
+
+  @Field(() => Int)
+  @Column('int', { default: 0 })
+  amount: number;
 
   @Field(() => User)
   @ManyToOne(() => User, user => user.workStudyConnection)

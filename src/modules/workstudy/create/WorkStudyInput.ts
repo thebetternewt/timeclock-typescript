@@ -1,5 +1,5 @@
 import { InputType, Field, Int, ID } from 'type-graphql';
-import { Matches } from 'class-validator';
+import { Matches, Min } from 'class-validator';
 
 @InputType()
 export class WorkStudyInput {
@@ -23,4 +23,8 @@ export class WorkStudyInput {
     message: 'End Date must match format YYYY-MM-DD.',
   })
   endDate: string;
+
+  @Field(() => Int)
+  @Min(0, { message: 'Amount cannot be negative.' })
+  amount: number;
 }
