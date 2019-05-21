@@ -41,13 +41,13 @@ export class WorkStudy extends BaseEntity {
   workStudyPeriodId: string;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user: User) => user.workStudyConnection)
-  @JoinColumn({ name: 'workStudyId' })
+  @ManyToOne(() => User, user => user.workStudyConnection)
+  @JoinColumn({ name: 'userId' })
   user: Promise<User>;
 
   @Field(() => Department)
-  @ManyToOne(() => Department, (dept: Department) => dept.workStudyConnection)
-  @JoinColumn({ name: 'workStudyId' })
+  @ManyToOne(() => Department, dept => dept.workStudyConnection)
+  @JoinColumn({ name: 'deptId' })
   department: Promise<Department>;
 
   @Field(() => WorkStudyPeriod)
@@ -99,11 +99,14 @@ export class WorkStudy extends BaseEntity {
     // Check if dates are outside of selected work study period.
     const period = await WorkStudyPeriod.findOne(this.workStudyPeriodId);
 
+    console.log(this.startDate);
+    console.log(period);
+
     if (!period) {
       throw new UserInputError('Work study period not found.');
     }
 
-    if (this.startDate < period.endDate || this.endDate > period.endDate) {
+    if (this.startDate < period.startDate || this.endDate > period.endDate) {
       throw new UserInputError(
         'Dates are outside of the selected work study period.'
       );

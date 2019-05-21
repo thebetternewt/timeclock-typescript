@@ -15,6 +15,8 @@ import { Department } from './Department';
 import { MyContext } from '../types/MyContext';
 import { Shift } from './Shift';
 import { WorkStudy } from './WorkStudy';
+import { isCurrentUser } from '../modules/utils/isCurrentUser';
+import { isSupervisor } from '../modules/utils/isSupervisor';
 
 @ObjectType()
 @Entity()
@@ -113,4 +115,18 @@ export class User extends BaseEntity {
 
   @OneToMany(() => WorkStudy, (ws: WorkStudy) => ws.user)
   workStudyConnection: Promise<WorkStudy[]>;
+
+  @Field(() => [WorkStudy], { name: 'workStudy' })
+  async workStudy(@Root() parent: User, @Ctx() ctx: MyContext) {
+    console.log(ctx.req.session);
+
+    if (
+      ctx.req.session!.isAdmin || // is Admin
+      (await isCurrentUser(ctx, parent)) // is Current User
+    ) {
+      return WorkStudy.find({ userId: parent.id });
+    }
+
+    return [];
+  }
 }

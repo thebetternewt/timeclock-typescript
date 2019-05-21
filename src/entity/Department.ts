@@ -55,7 +55,7 @@ export class Department extends BaseEntity {
   async shifts(
     @Root() parent: Department,
     @Ctx() ctx: MyContext
-  ): Promise<Shift[] | null> {
+  ): Promise<Shift[]> {
     // Check if user is supervisor before returning list of shifts.
     if (await isSupervisor(ctx, parent.id)) {
       return Shift.find({ deptId: parent.id });
@@ -71,7 +71,7 @@ export class Department extends BaseEntity {
   async workStudy(
     @Root() parent: Department,
     @Ctx() ctx: MyContext
-  ): Promise<WorkStudy[] | null> {
+  ): Promise<WorkStudy[]> {
     // Check if user is supervisor before returning list of shifts.
     if (await isSupervisor(ctx, parent.id)) {
       return WorkStudy.find({ deptId: parent.id });

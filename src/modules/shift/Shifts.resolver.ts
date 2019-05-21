@@ -4,7 +4,14 @@ import {
   MoreThanOrEqual,
   LessThanOrEqual,
 } from 'typeorm';
-import { Resolver, Query, UseMiddleware, Arg, Mutation } from 'type-graphql';
+import {
+  Resolver,
+  Query,
+  UseMiddleware,
+  Arg,
+  Mutation,
+  ID,
+} from 'type-graphql';
 
 import { isAdmin } from '../middleware/isAdmin';
 import { Shift } from '../../entity/Shift';
@@ -16,8 +23,8 @@ export class ShiftsResolver {
   @UseMiddleware(isAdmin)
   @Query(() => [Shift])
   async shifts(
-    @Arg('userId', { nullable: true }) userId?: string,
-    @Arg('deptId', { nullable: true }) deptId?: string,
+    @Arg('userId', () => ID, { nullable: true }) userId?: string,
+    @Arg('deptId', () => ID, { nullable: true }) deptId?: string,
     @Arg('startDate', { nullable: true }) startDate?: Date,
     @Arg('endDate', { nullable: true }) endDate?: Date
   ): Promise<Shift[]> {
