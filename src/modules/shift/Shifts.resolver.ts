@@ -60,7 +60,7 @@ export class ShiftsResolver {
 export class CreateShiftResolver {
   @UseMiddleware(isAdmin)
   @Mutation(() => Shift)
-  async createShift(@Arg('data') { id, ...data }: ShiftInput): Promise<Shift> {
+  async createShift(@Arg('data') data: ShiftInput): Promise<Shift> {
     return Shift.create(data).save();
   }
 }
@@ -69,14 +69,11 @@ export class CreateShiftResolver {
 export class UpdateShiftResolver {
   @UseMiddleware(isAdmin)
   @Mutation(() => Shift)
-  async updateShift(@Arg('data')
-  {
-    id,
-    timeIn,
-    timeOut,
-    userId,
-    deptId,
-  }: ShiftInput): Promise<Shift> {
+  async updateShift(
+    @Arg('id', () => ID) id: string,
+    @Arg('data')
+    { timeIn, timeOut, userId, deptId }: ShiftInput
+  ): Promise<Shift> {
     const shift = await Shift.findOne(id);
 
     if (!shift) {
@@ -89,5 +86,22 @@ export class UpdateShiftResolver {
     shift.deptId = deptId;
 
     return shift.save();
+  }
+}
+
+@Resolver()
+export class DeleteShiftResolver {
+  @UseMiddleware(isAdmin)
+  @Mutation(() => Boolean)
+  async deleteShift(@Arg('id', () => ID) id: string): Promise<boolean> {
+    const shift = await Shift.findOne(id);
+
+    if (!shift) {
+      return false;
+    }
+
+    await shift.remove();
+
+    return true;
   }
 }

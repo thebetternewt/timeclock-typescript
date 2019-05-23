@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID, Int } from 'type-graphql';
+import { ObjectType, Field, ID, Int, Float } from 'type-graphql';
 import {
   Entity,
   BaseEntity,
@@ -8,11 +8,23 @@ import {
   JoinColumn,
   BeforeInsert,
   BeforeUpdate,
+  LessThanOrEqual,
+  MoreThanOrEqual,
 } from 'typeorm';
 import { Department } from './Department';
 import { User } from './User';
 import { UserInputError } from 'apollo-server-core';
-import moment = require('moment');
+import {
+  parse,
+  format,
+  differenceInMinutes,
+  endOfDay,
+  isBefore,
+  isAfter,
+  getHours,
+  setHours,
+} from 'date-fns';
+import { WorkStudy } from './WorkStudy';
 
 @ObjectType()
 @Entity()
@@ -39,6 +51,53 @@ export class Shift extends BaseEntity {
   @Column()
   deptId: string;
 
+  @Field(() => Boolean)
+  async workStudy(): Promise<boolean> {
+    const period = await WorkStudy.findOne({
+      userId: this.userId,
+      deptId: this.deptId,
+      startDate: LessThanOrEqual(format(this.timeIn, 'YYYY-MM-DD')),
+      endDate: MoreThanOrEqual(format(this.timeIn, 'YYYY-MM-DD')),
+    });
+
+    if (period) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @Field(() => Float)
+  async nightShiftMinutes(): Promise<number> {
+    const midnight = endOfDay(this.timeIn);
+    // If shift crosses midnight...
+    if (isBefore(this.timeIn, midnight) && isAfter(this.timeOut, midnight)) {
+      // If time out is before 7:00am...
+      if (getHours(this.timeOut) < 7) {
+        // Calc number of minutes passed since midnight.
+        return differenceInMinutes(this.timeOut, midnight);
+      } else {
+        // Calc total number of minutes passed between midnight and cutoff (7:00am)
+        return 7 * 60; // 7 hours in minutes
+      }
+
+      // Else if clock in is after midnight and before 7:00am...
+    } else if (getHours(this.timeIn) < 7) {
+      // If time out is before 7:00am...
+      if (getHours(this.timeOut) < 7) {
+        // Calc total minutes elapsed in shift.
+        return differenceInMinutes(this.timeOut, this.timeIn);
+      } else {
+        // Calc total number of minutes passed between time in and cutoff (7:00am)
+        let sevenAm = parse(this.timeIn).setHours(7, 0, 0);
+        console.log('7am:', sevenAm);
+        return differenceInMinutes(sevenAm, this.timeIn);
+      }
+    }
+
+    return 0;
+  }
+
   @Field(() => User)
   @ManyToOne(() => User, user => user.shiftConnection)
   @JoinColumn({ name: 'userId' })
@@ -63,7 +122,10 @@ export class Shift extends BaseEntity {
   @BeforeUpdate()
   async updateMinutesElapsed(): Promise<void> {
     if (this.timeOut) {
-      this.minutesElapsed = moment(this.timeOut).diff(this.timeIn, 'minutes');
+      this.minutesElapsed = differenceInMinutes(
+        parse(this.timeOut),
+        parse(this.timeIn)
+      );
     }
   }
 }
