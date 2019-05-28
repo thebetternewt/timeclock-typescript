@@ -22,7 +22,6 @@ import {
   isBefore,
   isAfter,
   getHours,
-  setHours,
 } from 'date-fns';
 import { WorkStudy } from './WorkStudy';
 

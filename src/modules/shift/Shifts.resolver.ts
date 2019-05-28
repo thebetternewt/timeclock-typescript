@@ -52,7 +52,9 @@ export class ShiftsResolver {
       searchParams.timeIn = LessThanOrEqual(endDate);
     }
 
-    return Shift.find(searchParams);
+    console.log('searchParams:', searchParams);
+
+    return Shift.find({ where: searchParams, order: { timeIn: 'ASC' } });
   }
 }
 
