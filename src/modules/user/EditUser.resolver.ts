@@ -6,30 +6,35 @@ import { UserInputError } from 'apollo-server-core';
 
 @Resolver()
 export class UpdateUserResolver {
-  @Mutation(() => User)
-  async updateUser(@Arg('data')
-  {
-    id,
-    netId,
-    nineDigitId,
-    firstName,
-    lastName,
-    email,
-  }: UserInput): Promise<User> {
-    const user = await User.findOne(id);
+	@Mutation(() => User)
+	async updateUser(@Arg('data')
+	{
+		id,
+		netId,
+		nineDigitId,
+		firstName,
+		lastName,
+		email,
+		password,
+	}: UserInput): Promise<User> {
+		const user = await User.findOne(id);
 
-    if (!user) {
-      throw new UserInputError('User not found.');
-    }
+		if (!user) {
+			throw new UserInputError('User not found.');
+		}
 
-    user.firstName = firstName;
-    user.lastName = lastName;
-    user.netId = netId;
-    user.nineDigitId = nineDigitId;
-    user.email = email;
+		user.firstName = firstName;
+		user.lastName = lastName;
+		user.netId = netId;
+		user.nineDigitId = nineDigitId;
+		user.email = email;
 
-    await user.save();
+		if (password) {
+			user.password = password;
+		}
 
-    return user;
-  }
+		await user.save();
+
+		return user;
+	}
 }

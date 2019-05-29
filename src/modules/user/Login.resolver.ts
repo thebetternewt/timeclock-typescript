@@ -6,36 +6,39 @@ import { MyContext } from '../../types/MyContext';
 
 @Resolver()
 export class LoginResolver {
-  @Mutation(() => User, { nullable: true })
-  async login(
-    @Arg('netId') netId: string,
-    @Arg('password') password: string,
-    @Ctx() { req }: MyContext
-  ): Promise<User | null> {
-    const user = await User.findOne({ netId });
+	@Mutation(() => User, { nullable: true })
+	async login(
+		@Arg('netId') netId: string,
+		@Arg('password') password: string,
+		@Ctx() { req }: MyContext
+	): Promise<User | null> {
+		const user = await User.findOne({ netId });
 
-    // Check if user exists.
-    if (!user) {
-      throw new AuthenticationError('Invalid login credentials.');
-    }
+		console.log('netId:', netId);
+		console.log('user:', user);
 
-    // Check if user is active.
-    if (!user.active) {
-      throw new AuthenticationError(
-        'Your account is inactive. Please contact your system administrator'
-      );
-    }
+		// Check if user exists.
+		if (!user) {
+			throw new AuthenticationError('Invalid login credentials.');
+		}
 
-    // Validate password
-    const valid = await compare(password, user.password);
+		// Check if user is active.
+		if (!user.active) {
+			throw new AuthenticationError(
+				'Your account is inactive. Please contact your system administrator'
+			);
+		}
 
-    if (!valid) {
-      throw new AuthenticationError('Invalid login credentials.');
-    }
+		// Validate password
+		const valid = await compare(password, user.password);
 
-    req.session!.userId = user.id;
-    req.session!.isAdmin = user.admin;
+		if (!valid) {
+			throw new AuthenticationError('Invalid login credentials.');
+		}
 
-    return user;
-  }
+		req.session!.userId = user.id;
+		req.session!.isAdmin = user.admin;
+
+		return user;
+	}
 }

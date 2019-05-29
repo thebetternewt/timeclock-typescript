@@ -1,9 +1,9 @@
 import {
-  Entity,
-  Column,
-  BaseEntity,
-  PrimaryGeneratedColumn,
-  OneToMany,
+	Entity,
+	Column,
+	BaseEntity,
+	PrimaryGeneratedColumn,
+	OneToMany,
 } from 'typeorm';
 import { ObjectType, Field, ID, Ctx, Root } from 'type-graphql';
 
@@ -17,66 +17,68 @@ import { WorkStudy } from './WorkStudy';
 @ObjectType()
 @Entity()
 export class Department extends BaseEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+	@Field(() => ID)
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
-  @Field()
-  @Column({ unique: true })
-  name: string;
+	@Field()
+	@Column({ unique: true })
+	name: string;
 
-  @OneToMany(() => UserDepartment, ud => ud.department)
-  userConnection: Promise<UserDepartment[]>;
+	@OneToMany(() => UserDepartment, ud => ud.department)
+	userConnection: Promise<UserDepartment[]>;
 
-  @Field(() => [User])
-  async users(
-    @Root() parent: Department,
-    @Ctx() ctx: MyContext
-  ): Promise<User[] | null> {
-    // Check if user is supervisor before returning list of users.
-    if (await isSupervisor(ctx, parent.id)) {
-      const users = (await ctx.usersLoader.load(this.id)) || [];
-      return users;
-    }
+	@Field(() => [User])
+	async users(
+		@Root() parent: Department,
+		@Ctx() ctx: MyContext
+	): Promise<User[] | null> {
+		console.log(parent);
+		// Check if user is supervisor before returning list of users.
+		if (await isSupervisor(ctx, parent.id)) {
+			const users = (await ctx.usersLoader.load(this.id)) || [];
+			console.log(users);
+			return users;
+		}
 
-    return [];
-  }
+		return [];
+	}
 
-  @Field(() => [User])
-  async supervisors(@Ctx() { supervisorsLoader }: MyContext): Promise<User[]> {
-    const supervisors = (await supervisorsLoader.load(this.id)) || [];
-    return supervisors;
-  }
+	@Field(() => [User])
+	async supervisors(@Ctx() { supervisorsLoader }: MyContext): Promise<User[]> {
+		const supervisors = (await supervisorsLoader.load(this.id)) || [];
+		return supervisors;
+	}
 
-  @OneToMany(() => Shift, shift => shift.department)
-  shiftConnection: Promise<Shift[]>;
+	@OneToMany(() => Shift, shift => shift.department)
+	shiftConnection: Promise<Shift[]>;
 
-  @Field(() => [Shift], { defaultValue: [] })
-  async shifts(
-    @Root() parent: Department,
-    @Ctx() ctx: MyContext
-  ): Promise<Shift[]> {
-    // Check if user is supervisor before returning list of shifts.
-    if (await isSupervisor(ctx, parent.id)) {
-      return Shift.find({ deptId: parent.id });
-    }
+	@Field(() => [Shift], { defaultValue: [] })
+	async shifts(
+		@Root() parent: Department,
+		@Ctx() ctx: MyContext
+	): Promise<Shift[]> {
+		// Check if user is supervisor before returning list of shifts.
+		if (await isSupervisor(ctx, parent.id)) {
+			return Shift.find({ deptId: parent.id });
+		}
 
-    return [];
-  }
+		return [];
+	}
 
-  @OneToMany(() => WorkStudy, ws => ws.department)
-  workStudyConnection: Promise<WorkStudy[]>;
+	@OneToMany(() => WorkStudy, ws => ws.department)
+	workStudyConnection: Promise<WorkStudy[]>;
 
-  @Field(() => [WorkStudy], { defaultValue: [] })
-  async workStudy(
-    @Root() parent: Department,
-    @Ctx() ctx: MyContext
-  ): Promise<WorkStudy[]> {
-    // Check if user is supervisor before returning list of shifts.
-    if (await isSupervisor(ctx, parent.id)) {
-      return WorkStudy.find({ deptId: parent.id });
-    }
+	@Field(() => [WorkStudy], { defaultValue: [] })
+	async workStudy(
+		@Root() parent: Department,
+		@Ctx() ctx: MyContext
+	): Promise<WorkStudy[]> {
+		// Check if user is supervisor before returning list of shifts.
+		if (await isSupervisor(ctx, parent.id)) {
+			return WorkStudy.find({ deptId: parent.id });
+		}
 
-    return [];
-  }
+		return [];
+	}
 }
