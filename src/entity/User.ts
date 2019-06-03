@@ -1,12 +1,12 @@
 import {
-  Entity,
-  Column,
-  BaseEntity,
-  PrimaryGeneratedColumn,
-  BeforeInsert,
-  BeforeUpdate,
-  OneToMany,
-  IsNull,
+	Entity,
+	Column,
+	BaseEntity,
+	PrimaryGeneratedColumn,
+	BeforeInsert,
+	BeforeUpdate,
+	OneToMany,
+	IsNull,
 } from 'typeorm';
 import { ObjectType, Field, ID, Root, Ctx } from 'type-graphql';
 import { hash } from 'bcryptjs';
@@ -21,112 +21,126 @@ import { isSupervisor } from '../modules/utils/isSupervisor';
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+	@Field(() => ID)
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
-  @Field()
-  @Column({ unique: true })
-  netId: string;
+	@Field()
+	@Column({ unique: true })
+	netId: string;
 
-  @Field()
-  @Column({ unique: true })
-  nineDigitId: string;
+	@Field()
+	@Column({ unique: true })
+	nineDigitId: string;
 
-  @Field()
-  @Column()
-  firstName: string;
+	@Field()
+	@Column()
+	firstName: string;
 
-  @Field()
-  @Column()
-  lastName: string;
+	@Field()
+	@Column()
+	lastName: string;
 
-  @Field()
-  name(@Root() parent: User): string {
-    return `${parent.firstName} ${parent.lastName}`;
-  }
+	@Field()
+	name(@Root() parent: User): string {
+		return `${parent.firstName} ${parent.lastName}`;
+	}
 
-  @Field()
-  @Column({ default: false })
-  admin: boolean;
+	@Field()
+	@Column({ default: false })
+	admin: boolean;
 
-  @Field()
-  @Column({ default: true })
-  active: boolean;
+	@Field(() => Boolean)
+	async supervisor(@Root() parent: User): Promise<boolean> {
+		const userDept = await UserDepartment.findOne({
+			userId: parent.id,
+			supervisor: true,
+		});
 
-  @Field()
-  @Column('text', { unique: true })
-  email: string;
+		if (userDept) {
+			return true;
+		}
 
-  @Column()
-  password: string;
+		return false;
+	}
 
-  @Field(() => Shift, { nullable: true })
-  async lastShift(@Root() parent: User): Promise<Shift | undefined> {
-    return Shift.findOne({ userId: parent.id }, { order: { timeIn: 'DESC' } });
-  }
+	@Field()
+	@Column({ default: true })
+	active: boolean;
 
-  @Field(() => Boolean)
-  async isClockedIn(@Root() parent: User): Promise<boolean> {
-    const shift = await Shift.findOne({ userId: parent.id, timeOut: IsNull() });
-    return !!shift;
-  }
+	@Field()
+	@Column('text', { unique: true })
+	email: string;
 
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    this.password = await hash(this.password, 12);
-  }
+	@Column()
+	password: string;
 
-  @BeforeInsert()
-  @BeforeUpdate()
-  async lowercaseEmail() {
-    this.email = this.email.toLowerCase();
-  }
+	@Field(() => Shift, { nullable: true })
+	async lastShift(@Root() parent: User): Promise<Shift | undefined> {
+		return Shift.findOne({ userId: parent.id }, { order: { timeIn: 'DESC' } });
+	}
 
-  @OneToMany(() => UserDepartment, ud => ud.user)
-  departmentConnection: Promise<UserDepartment[]>;
+	@Field(() => Boolean)
+	async isClockedIn(@Root() parent: User): Promise<boolean> {
+		const shift = await Shift.findOne({ userId: parent.id, timeOut: IsNull() });
+		return !!shift;
+	}
 
-  @Field(() => [Department], { defaultValue: [] })
-  async departments(@Ctx()
-  {
-    departmentsLoader,
-  }: MyContext): Promise<Department[]> {
-    const departments = await departmentsLoader.load(this.id);
-    return departments || [];
-  }
+	@BeforeInsert()
+	@BeforeUpdate()
+	async hashPassword() {
+		this.password = await hash(this.password, 12);
+	}
 
-  @Field(() => [Department], { defaultValue: [] })
-  async supervisedDepartments(@Ctx()
-  {
-    supervisedDepartmentsLoader,
-  }: MyContext): Promise<Department[]> {
-    const departments = await supervisedDepartmentsLoader.load(this.id);
-    return departments || [];
-  }
+	@BeforeInsert()
+	@BeforeUpdate()
+	async lowercaseEmail() {
+		this.email = this.email.toLowerCase();
+	}
 
-  @OneToMany(() => Shift, (shift: Shift) => shift.user)
-  shiftConnection: Promise<Shift[]>;
+	@OneToMany(() => UserDepartment, ud => ud.user)
+	departmentConnection: Promise<UserDepartment[]>;
 
-  @Field(() => [Shift], { defaultValue: [] })
-  async shifts(@Root() parent: User) {
-    return Shift.find({ userId: parent.id });
-  }
+	@Field(() => [Department], { defaultValue: [] })
+	async departments(@Ctx()
+	{
+		departmentsLoader,
+	}: MyContext): Promise<Department[]> {
+		const departments = await departmentsLoader.load(this.id);
+		return departments || [];
+	}
 
-  @OneToMany(() => WorkStudy, (ws: WorkStudy) => ws.user)
-  workStudyConnection: Promise<WorkStudy[]>;
+	@Field(() => [Department], { defaultValue: [] })
+	async supervisedDepartments(@Ctx()
+	{
+		supervisedDepartmentsLoader,
+	}: MyContext): Promise<Department[]> {
+		const departments = await supervisedDepartmentsLoader.load(this.id);
+		return departments || [];
+	}
 
-  @Field(() => [WorkStudy], { name: 'workStudy' })
-  async workStudy(@Root() parent: User, @Ctx() ctx: MyContext) {
-    console.log(ctx.req.session);
+	@OneToMany(() => Shift, (shift: Shift) => shift.user)
+	shiftConnection: Promise<Shift[]>;
 
-    if (
-      ctx.req.session!.isAdmin || // is Admin
-      (await isCurrentUser(ctx, parent)) // is Current User
-    ) {
-      return WorkStudy.find({ userId: parent.id });
-    }
+	@Field(() => [Shift], { defaultValue: [] })
+	async shifts(@Root() parent: User) {
+		return Shift.find({ userId: parent.id });
+	}
 
-    return [];
-  }
+	@OneToMany(() => WorkStudy, (ws: WorkStudy) => ws.user)
+	workStudyConnection: Promise<WorkStudy[]>;
+
+	@Field(() => [WorkStudy], { name: 'workStudy' })
+	async workStudy(@Root() parent: User, @Ctx() ctx: MyContext) {
+		console.log(ctx.req.session);
+
+		if (
+			ctx.req.session!.isAdmin || // is Admin
+			(await isCurrentUser(ctx, parent)) // is Current User
+		) {
+			return WorkStudy.find({ userId: parent.id });
+		}
+
+		return [];
+	}
 }

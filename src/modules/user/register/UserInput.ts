@@ -10,9 +10,6 @@ import {
 @InputType()
 export class UserInput {
 	@Field()
-	id: string;
-
-	@Field()
 	@MaxLength(8)
 	netId: string;
 
@@ -33,7 +30,7 @@ export class UserInput {
 	@IsEmail()
 	email: string;
 
-	@Field()
+	@Field({ nullable: true })
 	@MinLength(6, { message: 'Password must be at least 6 characters long.' })
 	password?: string;
 }

@@ -1,22 +1,19 @@
-import { Resolver, Mutation, Arg } from 'type-graphql';
+import { Resolver, Mutation, Arg, ID, UseMiddleware } from 'type-graphql';
+import { UserInputError } from 'apollo-server-core';
 
 import { User } from '../../entity/User';
 import { UserInput } from './register/UserInput';
-import { UserInputError } from 'apollo-server-core';
+import { isAdmin } from '../middleware/isAdmin';
 
 @Resolver()
 export class UpdateUserResolver {
+	@UseMiddleware(isAdmin)
 	@Mutation(() => User)
-	async updateUser(@Arg('data')
-	{
-		id,
-		netId,
-		nineDigitId,
-		firstName,
-		lastName,
-		email,
-		password,
-	}: UserInput): Promise<User> {
+	async updateUser(
+		@Arg('id', () => ID) id: string,
+		@Arg('data')
+		{ netId, nineDigitId, firstName, lastName, email, password }: UserInput
+	): Promise<User> {
 		const user = await User.findOne(id);
 
 		if (!user) {
