@@ -1,109 +1,118 @@
+import { MyContext } from './../../types/MyContext';
 import {
-  Between,
-  FindOperator,
-  MoreThanOrEqual,
-  LessThanOrEqual,
+	Between,
+	FindOperator,
+	MoreThanOrEqual,
+	LessThanOrEqual,
 } from 'typeorm';
 import {
-  Resolver,
-  Query,
-  UseMiddleware,
-  Arg,
-  Mutation,
-  ID,
+	Resolver,
+	Query,
+	UseMiddleware,
+	Arg,
+	Mutation,
+	ID,
+	Ctx,
 } from 'type-graphql';
 
 import { isAdmin } from '../middleware/isAdmin';
+import { isAuth } from '../middleware/isAuth';
 import { Shift } from '../../entity/Shift';
 import { ShiftInput } from './shifts/ShiftInput';
-import { UserInputError } from 'apollo-server-core';
+import { UserInputError, ForbiddenError } from 'apollo-server-core';
 
 @Resolver()
 export class ShiftsResolver {
-  @UseMiddleware(isAdmin)
-  @Query(() => [Shift])
-  async shifts(
-    @Arg('userId', () => ID, { nullable: true }) userId?: string,
-    @Arg('deptId', () => ID, { nullable: true }) deptId?: string,
-    @Arg('startDate', { nullable: true }) startDate?: Date,
-    @Arg('endDate', { nullable: true }) endDate?: Date
-  ): Promise<Shift[]> {
-    interface ShiftSearchParams {
-      userId?: string;
-      deptId?: string;
-      timeIn?: FindOperator<any> | Date;
-    }
+	@UseMiddleware(isAuth)
+	@Query(() => [Shift])
+	async shifts(
+		@Ctx() { req }: MyContext,
+		@Arg('userId', () => ID, { nullable: true }) userId?: string,
+		@Arg('deptId', () => ID, { nullable: true }) deptId?: string,
+		@Arg('startDate', { nullable: true }) startDate?: Date,
+		@Arg('endDate', { nullable: true }) endDate?: Date
+	): Promise<Shift[]> {
+		const { isAdmin, userId: currentUserId } = req.session!;
+		if (!isAdmin && !(userId === currentUserId)) {
+			throw new ForbiddenError('Not authorized!');
+		}
 
-    const searchParams: ShiftSearchParams = {};
+		interface ShiftSearchParams {
+			userId?: string;
+			deptId?: string;
+			timeIn?: FindOperator<any> | Date;
+		}
 
-    if (userId) {
-      searchParams.userId = userId;
-    }
+		const searchParams: ShiftSearchParams = {};
 
-    if (deptId) {
-      searchParams.deptId = deptId;
-    }
+		if (userId) {
+			searchParams.userId = userId;
+		}
 
-    if (startDate && endDate) {
-      searchParams.timeIn = Between(startDate, endDate);
-    } else if (startDate) {
-      searchParams.timeIn = MoreThanOrEqual(startDate);
-    } else if (endDate) {
-      searchParams.timeIn = LessThanOrEqual(endDate);
-    }
+		if (deptId) {
+			searchParams.deptId = deptId;
+		}
 
-    console.log('searchParams:', searchParams);
+		if (startDate && endDate) {
+			searchParams.timeIn = Between(startDate, endDate);
+		} else if (startDate) {
+			searchParams.timeIn = MoreThanOrEqual(startDate);
+		} else if (endDate) {
+			searchParams.timeIn = LessThanOrEqual(endDate);
+		}
 
-    return Shift.find({ where: searchParams, order: { timeIn: 'ASC' } });
-  }
+		console.log('searchParams:', searchParams);
+
+		return Shift.find({ where: searchParams, order: { timeIn: 'ASC' } });
+	}
 }
 
 @Resolver()
 export class CreateShiftResolver {
-  @UseMiddleware(isAdmin)
-  @Mutation(() => Shift)
-  async createShift(@Arg('data') data: ShiftInput): Promise<Shift> {
-    return Shift.create(data).save();
-  }
+	@UseMiddleware(isAdmin)
+	@Mutation(() => Shift)
+	async createShift(@Arg('data') data: ShiftInput): Promise<Shift> {
+		return Shift.create(data).save();
+	}
 }
 
 @Resolver()
 export class UpdateShiftResolver {
-  @UseMiddleware(isAdmin)
-  @Mutation(() => Shift)
-  async updateShift(
-    @Arg('id', () => ID) id: string,
-    @Arg('data')
-    { timeIn, timeOut, userId, deptId }: ShiftInput
-  ): Promise<Shift> {
-    const shift = await Shift.findOne(id);
+	@UseMiddleware(isAdmin)
+	@Mutation(() => Shift)
+	async updateShift(
+		@Arg('id', () => ID) id: string,
+		@Arg('data')
+		{ timeIn, timeOut, userId, deptId }: ShiftInput
+	): Promise<Shift> {
+		const shift = await Shift.findOne(id);
 
-    if (!shift) {
-      throw new UserInputError('Shift not found.');
-    }
+		if (!shift) {
+			throw new UserInputError('Shift not found.');
+		}
 
-    shift.timeIn = timeIn;
-    shift.timeOut = timeOut;
-    shift.userId = userId;
-    shift.deptId = deptId;
+		shift.timeIn = timeIn;
+		shift.timeOut = timeOut;
+		shift.userId = userId;
+		shift.deptId = deptId;
 
-    return shift.save();
-  }
+		return shift.save();
+	}
 }
 
 @Resolver()
 export class DeleteShiftResolver {
-  @UseMiddleware(isAdmin)
-  @Mutation(() => Boolean)
-  async deleteShift(@Arg('id', () => ID) id: string): Promise<boolean> {
-    const shift = await Shift.findOne(id);
+	@UseMiddleware(isAdmin)
+	@Mutation(() => Boolean)
+	async deleteShift(@Arg('id', () => ID) id: string): Promise<boolean> {
+		const shift = await Shift.findOne(id);
 
-    if (!shift) {
-      return false;
-    }
+		if (!shift) {
+			return false;
+		}
 
-    await shift.remove();
+		await shift.remove();
 
-    return true;
-  }
+		return true;
+	}
 }
