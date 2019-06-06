@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID, Int, Float, Root } from 'type-graphql';
+import { ObjectType, Field, ID, Int, Float } from 'type-graphql';
 import {
 	Entity,
 	BaseEntity,
@@ -10,7 +10,6 @@ import {
 	BeforeUpdate,
 	LessThanOrEqual,
 	MoreThanOrEqual,
-	Between,
 } from 'typeorm';
 import { Department } from './Department';
 import { User } from './User';
