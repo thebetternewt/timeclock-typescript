@@ -9,7 +9,8 @@
 		"serve": "node dist/index.js",
 		"dev": "ts-node-dev --respawn --transpileOnly --ignore-watch node_modules src/index.ts",
 		"db:setup": "ts-node ./src/test-utils/setup.ts",
-		"test": "npm run db:setup && jest"
+		"test": "npm run db:setup && jest",
+		"postinstall": "$(yarn bin)/pm2 install typescript"
 	},
 	"dependencies": {
 		"apollo-server-express": "^2.4.8",
