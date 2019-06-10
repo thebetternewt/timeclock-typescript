@@ -1,14 +1,14 @@
 import { Resolver, Mutation, Arg } from 'type-graphql';
 
 import { User } from '../../entity/User';
-import { RegisterInput } from './register/RegisterInput';
+import { UserInput } from './register/UserInput';
 
 @Resolver()
 export class RegisterResolver {
-  @Mutation(() => User)
-  async register(@Arg('data') userData: RegisterInput): Promise<User> {
-    const user = await User.create(userData).save();
+	@Mutation(() => User)
+	async register(@Arg('data') userData: UserInput): Promise<User> {
+		const user = await User.create(userData).save();
 
-    return user;
-  }
+		return user;
+	}
 }

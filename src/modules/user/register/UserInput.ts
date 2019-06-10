@@ -15,15 +15,15 @@ export class UserInput {
 
 	@Field()
 	// @Length(9, 9, { message: 'Must be exactly 9 digits' })
-	@Matches(/^\d{9}$/, { message: '(Student ID must be exactly 9 digits' })
+	@Matches(/^\d{9}$/, { message: 'Student ID must be exactly 9 digits' })
 	nineDigitId: string;
 
 	@Field()
-	@Length(1, 255)
+	@Length(1, 255, { message: 'First name cannot be blank.' })
 	firstName: string;
 
 	@Field()
-	@Length(1, 255)
+	@Length(1, 255, { message: 'Last name cannot be blank.' })
 	lastName: string;
 
 	@Field()
