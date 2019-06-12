@@ -33,4 +33,10 @@ export class UserInput {
 	@Field({ nullable: true })
 	@MinLength(6, { message: 'Password must be at least 6 characters long.' })
 	password?: string;
+
+	@Field()
+	dsf: boolean;
+
+	@Field()
+	admin: boolean;
 }

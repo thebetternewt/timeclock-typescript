@@ -1,4 +1,5 @@
 import { Resolver, Arg, Mutation, Ctx } from 'type-graphql';
+
 import { User } from '../../entity/User';
 import { compare } from 'bcryptjs';
 import { AuthenticationError } from 'apollo-server-core';

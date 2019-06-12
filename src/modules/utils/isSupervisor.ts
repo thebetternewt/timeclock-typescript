@@ -3,24 +3,33 @@ import { UserDepartment } from '../../entity/UserDepartment';
 
 // Check if user is admin or supervisor of specified department.
 export const isSupervisor = async (
-  { req }: MyContext,
-  deptId: string
+	{ req }: MyContext,
+	deptId?: string
 ): Promise<boolean> => {
-  const { userId, isAdmin } = req.session!;
+	const { userId, isAdmin } = req.session!;
 
-  if (isAdmin) {
-    return true;
-  }
+	// Always return true if user is admin.
+	if (isAdmin) {
+		return true;
+	}
 
-  const userDept = await UserDepartment.findOne({
-    userId,
-    deptId,
-    supervisor: true,
-  });
+	interface SupervisorSearchParams {
+		userId: string;
+		supervisor: boolean;
+		deptId?: string;
+	}
 
-  if (userDept) {
-    return true;
-  }
+	const searchParams: SupervisorSearchParams = { userId, supervisor: true };
 
-  return false;
+	if (deptId) {
+		searchParams.deptId = deptId;
+	}
+
+	const userDept = await UserDepartment.findOne(searchParams);
+
+	if (userDept) {
+		return true;
+	}
+
+	return false;
 };

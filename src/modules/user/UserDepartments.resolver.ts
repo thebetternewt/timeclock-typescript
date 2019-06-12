@@ -1,5 +1,7 @@
-import { Resolver, Mutation, Arg, UseMiddleware, ID } from 'type-graphql';
-import { UserInputError } from 'apollo-server-core';
+import { MyContext } from './../../types/MyContext';
+import { isSupervisor } from './../utils/isSupervisor';
+import { Resolver, Mutation, Arg, UseMiddleware, ID, Ctx } from 'type-graphql';
+import { UserInputError, ForbiddenError } from 'apollo-server-core';
 
 import { Department } from '../../entity/Department';
 import { User } from '../../entity/User';
@@ -9,36 +11,46 @@ import { isAdmin } from '../middleware/isAdmin';
 
 @Resolver()
 export class AddToDepartmentResolver {
-  @UseMiddleware(isAdmin)
-  @Mutation(() => Boolean)
-  async addToDepartment(
-    @Arg('userId', () => ID) userId: string,
-    @Arg('deptId', () => ID) deptId: string,
-    @Arg('supervisor', { nullable: true }) supervisor: boolean
-  ): Promise<boolean> {
-    // Check if user and department exist.
-    const department = await Department.findOne(deptId);
-    const user = await User.findOne(userId);
+	@UseMiddleware(isAuth)
+	@Mutation(() => Boolean)
+	async addToDepartment(
+		@Ctx() ctx: MyContext,
+		@Arg('userId', () => ID) userId: string,
+		@Arg('deptId', () => ID) deptId: string,
+		@Arg('supervisor', { nullable: true }) supervisor: boolean
+	): Promise<boolean> {
+		if (!isSupervisor(ctx, deptId)) {
+			throw new ForbiddenError('Not authorized.');
+		}
 
-    if (!department || !user) {
-      throw new UserInputError('User or department not found.');
-    }
+		// Check if user and department exist.
+		const department = await Department.findOne(deptId);
+		const user = await User.findOne(userId);
 
-    await UserDepartment.create({ userId, deptId, supervisor }).save();
+		if (!department || !user) {
+			throw new UserInputError('User or department not found.');
+		}
 
-    return true;
-  }
+		await UserDepartment.create({ userId, deptId, supervisor }).save();
+
+		return true;
+	}
 }
 @Resolver()
 export class RemoveFromDepartmentResolver {
-  @UseMiddleware(isAuth, isAdmin)
-  @Mutation(() => Boolean)
-  async removeFromDepartment(
-    @Arg('userId', () => ID) userId: string,
-    @Arg('deptId', () => ID) deptId: string
-  ): Promise<boolean> {
-    await UserDepartment.delete({ userId, deptId });
+	@UseMiddleware(isAuth)
+	@Mutation(() => Boolean)
+	async removeFromDepartment(
+		@Ctx() ctx: MyContext,
+		@Arg('userId', () => ID) userId: string,
+		@Arg('deptId', () => ID) deptId: string
+	): Promise<boolean> {
+		if (!isSupervisor(ctx, deptId)) {
+			throw new ForbiddenError('Not authorized.');
+		}
 
-    return true;
-  }
+		await UserDepartment.delete({ userId, deptId });
+
+		return true;
+	}
 }

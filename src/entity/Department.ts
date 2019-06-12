@@ -13,6 +13,7 @@ import { UserDepartment } from './UserDepartment';
 import { Shift } from './Shift';
 import { isSupervisor } from '../modules/utils/isSupervisor';
 import { WorkStudy } from './WorkStudy';
+import { Budget } from './Budget';
 
 @ObjectType()
 @Entity()
@@ -77,6 +78,22 @@ export class Department extends BaseEntity {
 		// Check if user is supervisor before returning list of shifts.
 		if (await isSupervisor(ctx, parent.id)) {
 			return WorkStudy.find({ deptId: parent.id });
+		}
+
+		return [];
+	}
+
+	@OneToMany(() => Budget, budget => budget.department)
+	budgetConnection: Promise<Budget[]>;
+
+	@Field(() => [Budget], { defaultValue: [] })
+	async budgets(
+		@Root() parent: Department,
+		@Ctx() ctx: MyContext
+	): Promise<Budget[]> {
+		// Check if user is supervisor before returning list of budgets.
+		if (await isSupervisor(ctx, parent.id)) {
+			return Budget.find({ deptId: parent.id });
 		}
 
 		return [];

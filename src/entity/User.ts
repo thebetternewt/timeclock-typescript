@@ -16,6 +16,7 @@ import { MyContext } from '../types/MyContext';
 import { Shift } from './Shift';
 import { WorkStudy } from './WorkStudy';
 import { isCurrentUser } from '../modules/utils/isCurrentUser';
+import { Dsf } from './Dsf';
 
 @ObjectType()
 @Entity()
@@ -43,6 +44,15 @@ export class User extends BaseEntity {
 	@Field()
 	name(@Root() parent: User): string {
 		return `${parent.firstName} ${parent.lastName}`;
+	}
+
+	@Field(() => Boolean)
+	async dsf(@Root() { id }: User): Promise<boolean> {
+		const dsf = await Dsf.findOne({ userId: id });
+
+		if (!dsf) return false;
+
+		return true;
 	}
 
 	@Field()
