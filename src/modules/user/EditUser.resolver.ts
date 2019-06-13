@@ -24,6 +24,12 @@ export class UpdateUserResolver {
 			firstName,
 			lastName,
 			email,
+			phone,
+			street1,
+			street2,
+			city,
+			state,
+			zip,
 			password,
 			dsf,
 			admin,
@@ -58,6 +64,24 @@ export class UpdateUserResolver {
 
 		if (isAdmin) {
 			user.admin = admin;
+		}
+		if (phone) {
+			user.phone = phone;
+		}
+		if (street1) {
+			user.street1 = street1;
+		}
+		if (street2) {
+			user.street2 = street2;
+		}
+		if (city) {
+			user.city = city;
+		}
+		if (state) {
+			user.state = state;
+		}
+		if (zip) {
+			user.zip = zip;
 		}
 
 		await user.save();

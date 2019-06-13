@@ -41,6 +41,30 @@ export class User extends BaseEntity {
 	@Column()
 	lastName: string;
 
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	phone?: string;
+
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	street1?: string;
+
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	street2?: string;
+
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	city?: string;
+
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	state?: string;
+
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	zip?: string;
+
 	@Field()
 	name(@Root() parent: User): string {
 		return `${parent.firstName} ${parent.lastName}`;

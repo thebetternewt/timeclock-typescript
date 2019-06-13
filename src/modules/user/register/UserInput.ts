@@ -5,6 +5,7 @@ import {
 	Matches,
 	IsEmail,
 	MinLength,
+	IsPhoneNumber,
 } from 'class-validator';
 
 @InputType()
@@ -39,4 +40,23 @@ export class UserInput {
 
 	@Field()
 	admin: boolean;
+
+	@Field({ nullable: true })
+	@IsPhoneNumber('US')
+	phone?: string;
+
+	@Field({ nullable: true })
+	street1?: string;
+
+	@Field({ nullable: true })
+	street2?: string;
+
+	@Field({ nullable: true })
+	city?: string;
+
+	@Field({ nullable: true })
+	state?: string;
+
+	@Field({ nullable: true })
+	zip?: string;
 }
