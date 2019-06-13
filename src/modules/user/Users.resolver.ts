@@ -1,7 +1,6 @@
 import { MyContext } from './../../types/MyContext';
 import { ForbiddenError } from 'apollo-server-core';
 import { Resolver, UseMiddleware, Query, Arg, ID, Ctx } from 'type-graphql';
-import { isAdmin } from '../middleware/isAdmin';
 import { User } from '../../entity/User';
 import { UserDepartment } from '../../entity/UserDepartment';
 import { In } from 'typeorm';
