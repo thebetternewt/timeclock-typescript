@@ -19,7 +19,7 @@ export class LoginResolver {
 		console.log('user:', user);
 
 		// Check if user exists.
-		if (!user) {
+		if (!user || !user.password) {
 			throw new AuthenticationError('Invalid login credentials.');
 		}
 
@@ -29,7 +29,6 @@ export class LoginResolver {
 				'Your account is inactive. Please contact your system administrator'
 			);
 		}
-
 		// Validate password
 		const valid = await compare(password, user.password);
 

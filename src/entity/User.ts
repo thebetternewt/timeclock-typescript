@@ -105,8 +105,8 @@ export class User extends BaseEntity {
 	@Column('text', { unique: true })
 	email: string;
 
-	@Column()
-	password: string;
+	@Column({ nullable: true })
+	password?: string;
 
 	@Field(() => Shift, { nullable: true })
 	async lastShift(@Root() parent: User): Promise<Shift | undefined> {
@@ -122,7 +122,9 @@ export class User extends BaseEntity {
 	@BeforeInsert()
 	@BeforeUpdate()
 	async hashPassword() {
-		this.password = await hash(this.password, 12);
+		if (this.password) {
+			this.password = await hash(this.password, 12);
+		}
 	}
 
 	@BeforeInsert()

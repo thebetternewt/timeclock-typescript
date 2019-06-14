@@ -71,6 +71,7 @@ const main = async () => {
 		})
 	);
 
+	// Configure CAS login routes if in production.
 	if (IN_PROD) {
 		// Configure CAS
 		cas.configure({
@@ -107,13 +108,10 @@ const main = async () => {
 	apolloServer.applyMiddleware({ app, cors: corsOptions });
 	apolloServer.applyMiddleware({ app });
 
-	console.log('admin: ', {
-		ADMIN_NETID,
-		ADMIN_EMAIL,
-		ADMIN_PASSWORD,
-	});
-
+	// Check for admin user and create one with supplied config credentials if one
+	// does not already exist in the database.
 	const adminUser = await User.findOne({ admin: true });
+
 	if (!adminUser) {
 		await User.create({
 			netId: ADMIN_NETID,
