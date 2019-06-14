@@ -15,6 +15,9 @@ import {
 	CAS_HOST,
 	CAS_SERVICE_VALIDATE,
 	CAS_LOGIN,
+	ADMIN_NETID,
+	ADMIN_EMAIL,
+	ADMIN_PASSWORD,
 } from './config';
 import { createUsersLoader } from './modules/utils/usersLoader';
 import { createSupervisorsLoader } from './modules/utils/supervisorsLoader';
@@ -103,6 +106,25 @@ const main = async () => {
 
 	apolloServer.applyMiddleware({ app, cors: corsOptions });
 	apolloServer.applyMiddleware({ app });
+
+	console.log('admin: ', {
+		ADMIN_NETID,
+		ADMIN_EMAIL,
+		ADMIN_PASSWORD,
+	});
+
+	const adminUser = await User.findOne({ admin: true });
+	if (!adminUser) {
+		await User.create({
+			netId: ADMIN_NETID,
+			nineDigitId: '0___7___0',
+			password: ADMIN_PASSWORD,
+			firstName: 'Web',
+			lastName: 'Master',
+			email: ADMIN_EMAIL,
+			admin: true,
+		}).save();
+	}
 
 	return app.listen(4000, () => {
 		console.log('environment:', process.env.NODE_ENV);

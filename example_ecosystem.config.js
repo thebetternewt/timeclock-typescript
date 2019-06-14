@@ -13,6 +13,9 @@ module.exports = {
 				SESS_NAME: 'tsid',
 				SESS_SECRET: 'mysecret123!',
 				SESS_LIFETIME: 1000 * 60 * 60, // 1 hour
+				ADMIN_NETID: 'admin',
+				ADMIN_EMAIL: 'admin@example.com',
+				ADMIN_PASSWORD: 'password',
 			},
 			env_production: {
 				NODE_ENV: 'production',
@@ -22,6 +25,9 @@ module.exports = {
 				CAS_HOST: 'cas.my.university.edu',
 				CAS_SERVICE_VALIDATE: '/cas/serviceValidate',
 				CAS_LOGIN: '/cas/login',
+				ADMIN_NETID: 'admin',
+				ADMIN_EMAIL: 'admin@example.com',
+				ADMIN_PASSWORD: 'password',
 			},
 		},
 	],

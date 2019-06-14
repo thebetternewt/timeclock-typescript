@@ -10,4 +10,7 @@ export const {
 	CAS_HOST,
 	CAS_SERVICE_VALIDATE,
 	CAS_LOGIN,
+	ADMIN_NETID,
+	ADMIN_EMAIL,
+	ADMIN_PASSWORD,
 } = process.env;
