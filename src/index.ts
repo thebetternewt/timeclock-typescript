@@ -2,15 +2,25 @@ import { ApolloServer } from 'apollo-server-express';
 import Express from 'express';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
+import cas from 'connect-cas';
 import { createConnection } from 'typeorm';
 
 import { createSchema } from './modules/utils/createSchema';
 import { redis } from './redis';
-import { SESS_NAME, SESS_SECRET, SESS_LIFETIME, IN_PROD } from './config';
+import {
+	SESS_NAME,
+	SESS_SECRET,
+	SESS_LIFETIME,
+	IN_PROD,
+	CAS_HOST,
+	CAS_SERVICE_VALIDATE,
+	CAS_LOGIN,
+} from './config';
 import { createUsersLoader } from './modules/utils/usersLoader';
 import { createSupervisorsLoader } from './modules/utils/supervisorsLoader';
 import { createSupervisedDepartmentsLoader } from './modules/utils/supervisedDepartmentsLoader';
 import { createDepartmentsLoader } from './modules/utils/departmentsLoader';
+import { User } from './entity/User';
 
 const main = async () => {
 	await createConnection();
@@ -27,14 +37,14 @@ const main = async () => {
 			departmentsLoader: createDepartmentsLoader(),
 			supervisedDepartmentsLoader: createSupervisedDepartmentsLoader(),
 		}),
-		playground: { version: '1.7.25' },
+		playground: !IN_PROD,
 	});
 
 	const app = Express();
 
 	const corsOptions = {
 		credentials: true,
-		origin: ['http://localhost:3000', 'http://dev.relatemediadesign.com:3000'],
+		origin: ['http://localhost:3000'],
 	};
 
 	const RedisStore = connectRedis(session);
@@ -51,16 +61,51 @@ const main = async () => {
 			rolling: true,
 			cookie: {
 				httpOnly: true,
-				secure: IN_PROD,
+				// TODO: Secure cookie -- need to handle reverse proxying behind nginx.
+				secure: false,
 				maxAge: +SESS_LIFETIME,
 			},
 		})
 	);
 
+	if (IN_PROD) {
+		// Configure CAS
+		cas.configure({
+			host: CAS_HOST,
+			paths: {
+				serviceValidate: CAS_SERVICE_VALIDATE,
+				login: CAS_LOGIN,
+			},
+		});
+
+		app.get(
+			'/login',
+			cas.serviceValidate(),
+			cas.authenticate(),
+			async (req, res) => {
+				const netId = req.session!.cas.user;
+
+				const user = await User.findOne({ netId });
+
+				console.log('user:', user);
+
+				if (user) {
+					req.session!.userId = user.id;
+					req.session!.isAdmin = user.admin;
+				}
+
+				// TODO: Handle user not found.
+
+				return res.redirect('https://timeclockdev.library.msstate.edu/home');
+			}
+		);
+	}
+
 	apolloServer.applyMiddleware({ app, cors: corsOptions });
 	apolloServer.applyMiddleware({ app });
 
 	return app.listen(4000, () => {
+		console.log('environment:', process.env.NODE_ENV);
 		console.log(`Server listening on http://localhost:4000/graphql`);
 	});
 };

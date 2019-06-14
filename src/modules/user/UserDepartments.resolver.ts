@@ -7,7 +7,6 @@ import { Department } from '../../entity/Department';
 import { User } from '../../entity/User';
 import { UserDepartment } from '../../entity/UserDepartment';
 import { isAuth } from '../middleware/isAuth';
-import { isAdmin } from '../middleware/isAdmin';
 
 @Resolver()
 export class AddToDepartmentResolver {
