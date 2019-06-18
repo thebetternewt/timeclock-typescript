@@ -5,26 +5,26 @@ import { User } from '../../entity/User';
 import { UserDepartment } from '../../entity/UserDepartment';
 
 const batchUsers = async (departmentIds: string[]) => {
-  // Inner Join User and Department tables and select were department Id is
-  // in list of department Ids and user is supervisor.
-  const userDepartments = await UserDepartment.find({
-    join: {
-      alias: 'userDepartment',
-      innerJoinAndSelect: {
-        user: 'userDepartment.user',
-      },
-    },
-    where: {
-      deptId: In(departmentIds),
-      supervisor: true,
-    },
-  });
+	// Inner Join User and Department tables and select were department Id is
+	// in list of department Ids and user is supervisor.
+	const userDepartments = await UserDepartment.find({
+		join: {
+			alias: 'userDepartment',
+			innerJoinAndSelect: {
+				user: 'userDepartment.user',
+			},
+		},
+		where: {
+			deptId: In(departmentIds),
+			supervisor: true,
+		},
+	});
 
-  // console.log('userDepartments:', userDepartments);
+	// console.log('userDepartments:', userDepartments);
 
-  const deptIdToUsers: { [key: string]: User[] } = {};
+	const deptIdToUsers: { [key: string]: User[] } = {};
 
-  /*
+	/*
   ==> Data looks like this:
 
   {
@@ -34,18 +34,18 @@ const batchUsers = async (departmentIds: string[]) => {
   }
   */
 
-  // Loop through the results and add them to the map.
-  userDepartments.forEach(du => {
-    if (du.deptId in deptIdToUsers) {
-      deptIdToUsers[du.deptId].push((du as any).__user__);
-    } else {
-      deptIdToUsers[du.deptId] = [(du as any).__user__];
-    }
-  });
+	// Loop through the results and add them to the map.
+	userDepartments.forEach(du => {
+		if (du.deptId in deptIdToUsers) {
+			deptIdToUsers[du.deptId].push((du as any).__user__);
+		} else {
+			deptIdToUsers[du.deptId] = [(du as any).__user__];
+		}
+	});
 
-  // console.log('userDepartments:', userDepartments);
+	// console.log('userDepartments:', userDepartments);
 
-  return departmentIds.map(deptId => deptIdToUsers[deptId]);
+	return departmentIds.map(deptId => deptIdToUsers[deptId]);
 };
 
 export const createSupervisorsLoader = () => new DataLoader(batchUsers);

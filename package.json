@@ -5,8 +5,10 @@
 	"license": "MIT",
 	"scripts": {
 		"build-ts": "tsc",
-		"start": "ts-node src/index.ts",
+		"start": "npm run serve:bundle",
+		"serve:bundle": "node dist/index.js",
 		"serve": "pm2 start ecosystem.config.js --env production",
+		"dev:pm2": "pm2 start --watch",
 		"dev": "ts-node-dev --respawn --transpileOnly --ignore-watch node_modules src/index.ts",
 		"db:setup": "ts-node ./src/test-utils/setup.ts",
 		"test": "npm run db:setup && jest",

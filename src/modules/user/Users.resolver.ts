@@ -28,7 +28,10 @@ export class UsersByDeptResolver {
 
 		const userIds = userDepartments.map(ud => ud.userId);
 
-		const users = await User.find({ id: In(userIds) });
+		const users = await User.find({
+			where: { id: In(userIds) },
+			order: { lastName: 'DESC' },
+		});
 
 		return users;
 	}
@@ -45,7 +48,7 @@ export class UsersResolver {
 			throw new ForbiddenError('Not authorized.');
 		}
 
-		return User.find({});
+		return User.find({ order: { lastName: 'DESC' } });
 	}
 }
 

@@ -20,21 +20,23 @@ import { isAuth } from '../middleware/isAuth';
 import { Shift } from '../../entity/Shift';
 import { ShiftInput } from './shifts/ShiftInput';
 import { UserInputError, ForbiddenError } from 'apollo-server-core';
+import { isSupervisor } from '../utils/isSupervisor';
 
 @Resolver()
 export class ShiftsResolver {
 	@UseMiddleware(isAuth)
 	@Query(() => [Shift])
 	async shifts(
-		@Ctx() { req }: MyContext,
+		@Ctx() ctx: MyContext,
 		@Arg('userId', () => ID, { nullable: true }) userId?: string,
 		@Arg('deptId', () => ID, { nullable: true }) deptId?: string,
 		@Arg('startDate', { nullable: true }) startDate?: Date,
 		@Arg('endDate', { nullable: true }) endDate?: Date
 	): Promise<Shift[]> {
-		const { isAdmin, userId: currentUserId } = req.session!;
-		if (!isAdmin && !(userId === currentUserId)) {
-			throw new ForbiddenError('Not authorized!');
+		const { isAdmin, userId: currentUserId } = ctx.req.session!;
+
+		if (!isAdmin && userId !== currentUserId && !isSupervisor(ctx, deptId)) {
+			throw new ForbiddenError('Not authorized...');
 		}
 
 		interface ShiftSearchParams {
