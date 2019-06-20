@@ -34,11 +34,9 @@ export class Department extends BaseEntity {
 		@Root() parent: Department,
 		@Ctx() ctx: MyContext
 	): Promise<User[] | null> {
-		console.log(parent);
 		// Check if user is supervisor before returning list of users.
 		if (await isSupervisor(ctx, parent.id)) {
 			const users = (await ctx.usersLoader.load(this.id)) || [];
-			console.log(users);
 			return users;
 		}
 

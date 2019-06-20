@@ -103,9 +103,6 @@ export class WorkStudy extends BaseEntity {
     // Check if dates are outside of selected work study period.
     const period = await WorkStudyPeriod.findOne(this.workStudyPeriodId);
 
-    console.log(this.startDate);
-    console.log(period);
-
     if (!period) {
       throw new UserInputError('Work study period not found.');
     }

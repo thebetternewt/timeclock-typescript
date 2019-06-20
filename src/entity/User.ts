@@ -167,7 +167,6 @@ export class User extends BaseEntity {
 
 	@Field(() => [WorkStudy], { name: 'workStudy' })
 	async workStudy(@Root() parent: User, @Ctx() ctx: MyContext) {
-		console.log(ctx.req.session);
 
 		if (
 			ctx.req.session!.isAdmin || // is Admin

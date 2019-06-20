@@ -21,6 +21,8 @@ import { Shift } from '../../entity/Shift';
 import { ShiftInput } from './shifts/ShiftInput';
 import { UserInputError, ForbiddenError } from 'apollo-server-core';
 import { isSupervisor } from '../utils/isSupervisor';
+import { isCurrentUser } from '../utils/isCurrentUser';
+import { User } from '../../entity/User';
 
 @Resolver()
 export class ShiftsResolver {
@@ -63,8 +65,6 @@ export class ShiftsResolver {
 			searchParams.timeIn = LessThanOrEqual(endDate);
 		}
 
-		console.log('searchParams:', searchParams);
-
 		return Shift.find({ where: searchParams, order: { timeIn: 'ASC' } });
 	}
 }
@@ -80,13 +80,20 @@ export class CreateShiftResolver {
 
 @Resolver()
 export class UpdateShiftResolver {
-	@UseMiddleware(isAdmin)
+	@UseMiddleware(isAuth)
 	@Mutation(() => Shift)
 	async updateShift(
+		@Ctx() ctx: MyContext,
 		@Arg('id', () => ID) id: string,
 		@Arg('data')
 		{ timeIn, timeOut, userId, deptId }: ShiftInput
 	): Promise<Shift> {
+		const user = await User.findOne(userId);
+
+		if (!isCurrentUser(ctx, user!) && !isSupervisor(ctx, deptId)) {
+			throw new ForbiddenError('Not authorized!');
+		}
+
 		const shift = await Shift.findOne(id);
 
 		if (!shift) {

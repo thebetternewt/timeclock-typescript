@@ -40,7 +40,6 @@ export class AllBudgetResolver {
 				userId,
 				supervisor: true,
 			});
-			console.log('supervisedDepts:', supervisedDepts);
 
 			// Throw error if user is not supervising any departments
 			if (supervisedDepts.length === 0) {
@@ -55,7 +54,6 @@ export class AllBudgetResolver {
 				deptIds.includes(budget.deptId);
 			});
 
-			console.log(budgets);
 		}
 
 		return budgets;

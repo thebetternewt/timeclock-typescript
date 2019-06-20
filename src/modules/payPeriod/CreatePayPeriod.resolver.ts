@@ -8,7 +8,6 @@ export class CreatePayPeriodResolver {
   @UseMiddleware(isAdmin)
   @Mutation(() => PayPeriod)
   async createPayPeriod(@Arg('data') data: PayPeriodInput): Promise<PayPeriod> {
-    console.log(data);
     const payPeriod = PayPeriod.create(data).save();
     return payPeriod;
   }

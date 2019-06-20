@@ -7,13 +7,11 @@ import { isAuth } from '../middleware/isAuth';
 export class MeResolver {
 	@Query(() => User, { nullable: true, complexity: 5 })
 	@UseMiddleware(isAuth)
-	async me(@Ctx() { req }: MyContext): Promise<User | undefined> {
+	async me(@Ctx() { req }: MyContext): Promise<User> {
 		if (!req.session!.userId) {
 			return undefined;
 		}
-		const me = await User.findOne(req.session!.userId);
-
-		console.log('me:', me);
-		return me;
+		
+		return User.findOne(req.session!.userId);
 	}
 }

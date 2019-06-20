@@ -89,7 +89,6 @@ export class Shift extends BaseEntity {
 			} else {
 				// Calc total number of minutes passed between time in and cutoff (7:00am)
 				let sevenAm = parse(this.timeIn).setHours(7, 0, 0);
-				console.log('7am:', sevenAm);
 				return differenceInMinutes(sevenAm, this.timeIn);
 			}
 		}
@@ -133,7 +132,6 @@ export class Shift extends BaseEntity {
 			],
 		});
 
-		console.log('shift:', shift);
 
 		if (shift && shift.id !== this.id) {
 			throw new UserInputError('Overlapping shift already exists.');
@@ -145,7 +143,6 @@ export class Shift extends BaseEntity {
 	@BeforeInsert()
 	@BeforeUpdate()
 	async validateTimeOut(): Promise<boolean> {
-		console.log(this);
 		if (this.timeOut && this.timeOut < this.timeIn) {
 			throw new UserInputError('Time out must be after time in.');
 		}

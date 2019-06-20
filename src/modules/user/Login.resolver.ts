@@ -15,9 +15,6 @@ export class LoginResolver {
 	): Promise<User | null> {
 		const user = await User.findOne({ netId });
 
-		console.log('netId:', netId);
-		console.log('user:', user);
-
 		// Check if user exists.
 		if (!user || !user.password) {
 			throw new AuthenticationError('Invalid login credentials.');

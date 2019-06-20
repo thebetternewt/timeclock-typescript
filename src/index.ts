@@ -91,8 +91,6 @@ const main = async () => {
 
 				const user = await User.findOne({ netId });
 
-				console.log('user:', user);
-
 				if (user) {
 					req.session!.userId = user.id;
 					req.session!.isAdmin = user.admin;

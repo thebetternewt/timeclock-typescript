@@ -25,8 +25,6 @@ export class ClockInResolver {
 
     shift = await Shift.create({ timeIn: new Date(), userId, deptId }).save();
 
-    console.log(shift);
-
     return shift;
   }
 }
