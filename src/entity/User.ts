@@ -17,6 +17,7 @@ import { Shift } from './Shift';
 import { WorkStudy } from './WorkStudy';
 import { isCurrentUser } from '../modules/utils/isCurrentUser';
 import { Dsf } from './Dsf';
+import { isSupervisor } from '../modules/utils/isSupervisor';
 
 @ObjectType()
 @Entity()
@@ -166,15 +167,7 @@ export class User extends BaseEntity {
 	workStudyConnection: Promise<WorkStudy[]>;
 
 	@Field(() => [WorkStudy], { name: 'workStudy' })
-	async workStudy(@Root() parent: User, @Ctx() ctx: MyContext) {
-
-		if (
-			ctx.req.session!.isAdmin || // is Admin
-			(await isCurrentUser(ctx, parent)) // is Current User
-		) {
-			return WorkStudy.find({ userId: parent.id });
-		}
-
-		return [];
+	async workStudy(@Root() parent: User) {
+		return WorkStudy.find({ userId: parent.id });
 	}
 }
