@@ -15,9 +15,7 @@ import { Department } from './Department';
 import { MyContext } from '../types/MyContext';
 import { Shift } from './Shift';
 import { WorkStudy } from './WorkStudy';
-import { isCurrentUser } from '../modules/utils/isCurrentUser';
 import { Dsf } from './Dsf';
-import { isSupervisor } from '../modules/utils/isSupervisor';
 
 @ObjectType()
 @Entity()
