@@ -19,7 +19,7 @@ const batchUsers = async (departmentIds: string[]) => {
 		},
 	});
 
-	console.log('userDepts:', userDepartments);
+	// console.log('userDepts:', userDepartments);
 
 	const deptIdToUsers: { [key: string]: User[] } = {};
 
