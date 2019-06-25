@@ -71,9 +71,17 @@ export class ShiftsResolver {
 
 @Resolver()
 export class CreateShiftResolver {
-	@UseMiddleware(isAdmin)
+	@UseMiddleware(isAuth)
 	@Mutation(() => Shift)
-	async createShift(@Arg('data') data: ShiftInput): Promise<Shift> {
+	async createShift(
+		@Ctx() ctx: MyContext,
+		@Arg('data') data: ShiftInput
+	): Promise<Shift> {
+		// Throw error if current user not admin or supervisor of shift department.
+		if (!isSupervisor(ctx, data.deptId)) {
+			throw new ForbiddenError('Not authorized!');
+		}
+
 		return Shift.create(data).save();
 	}
 }

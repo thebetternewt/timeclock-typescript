@@ -8,6 +8,12 @@ import { User } from '../../entity/User';
 import { UserDepartment } from '../../entity/UserDepartment';
 import { isAuth } from '../middleware/isAuth';
 
+interface UserDepartmentOptions {
+	userId: string;
+	deptId: string;
+	supervisor?: boolean;
+}
+
 @Resolver()
 export class AddToDepartmentResolver {
 	@UseMiddleware(isAuth)
@@ -30,7 +36,17 @@ export class AddToDepartmentResolver {
 			throw new UserInputError('User or department not found.');
 		}
 
-		await UserDepartment.create({ userId, deptId, supervisor }).save();
+		const userDepartmentOptions: UserDepartmentOptions = { userId, deptId };
+
+		const currentUser = await User.findOne(ctx.req.session!.userId);
+
+		if (currentUser && currentUser.admin) {
+			if (typeof supervisor !== 'undefined') {
+				userDepartmentOptions.supervisor = supervisor;
+			}
+		}
+
+		await UserDepartment.create(userDepartmentOptions).save();
 
 		return true;
 	}
@@ -46,6 +62,14 @@ export class RemoveFromDepartmentResolver {
 	): Promise<boolean> {
 		if (!isSupervisor(ctx, deptId)) {
 			throw new ForbiddenError('Not authorized.');
+		}
+
+		const userDepartment = await UserDepartment.findOne({ userId, deptId });
+
+		if (userDepartment && userDepartment.supervisor) {
+			throw new ForbiddenError(
+				'Not allowed to remove supervisor from department.'
+			);
 		}
 
 		await UserDepartment.delete({ userId, deptId });
