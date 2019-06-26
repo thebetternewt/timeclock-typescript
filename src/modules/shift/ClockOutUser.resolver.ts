@@ -23,6 +23,7 @@ export class ClockOutUserResolver {
 			throw new UserInputError('User not clocked in.');
 		}
 
+		// Throw error if not current user or department supervisor.
 		if (
 			!isCurrentUser(ctx, await shift.user) &&
 			!isSupervisor(ctx, shift.deptId)

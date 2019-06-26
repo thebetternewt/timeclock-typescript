@@ -44,10 +44,10 @@ export class Shift extends BaseEntity {
 	@Column('int', { nullable: true })
 	minutesElapsed: number;
 
-	@Column()
+	@Column('uuid')
 	userId: string;
 
-	@Column()
+	@Column('uuid')
 	deptId: string;
 
 	@Field(() => Boolean)
@@ -131,7 +131,6 @@ export class Shift extends BaseEntity {
 				},
 			],
 		});
-
 
 		if (shift && shift.id !== this.id) {
 			throw new UserInputError('Overlapping shift already exists.');

@@ -24,8 +24,8 @@
 		"experimentalDecorators": true,
 		"skipLibCheck": false,
 		"baseUrl": ".",
-		"rootDir": "src",
-		"types": ["node"]
+		"rootDir": "src"
+		// "types": ["node", "jest"]
 	},
 	"exclude": ["node_modules"],
 	"include": ["src/**/*"]

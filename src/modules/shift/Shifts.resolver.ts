@@ -58,6 +58,7 @@ export class ShiftsResolver {
 		}
 
 		if (startDate && endDate) {
+			console.log('start:', startDate, 'end:', endDate);
 			searchParams.timeIn = Between(startDate, endDate);
 		} else if (startDate) {
 			searchParams.timeIn = MoreThanOrEqual(startDate);
