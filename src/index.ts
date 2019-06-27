@@ -18,6 +18,9 @@ import {
 	ADMIN_NETID,
 	ADMIN_EMAIL,
 	ADMIN_PASSWORD,
+	TEST_USER_EMAIL,
+	TEST_USER_NETID,
+	TEST_USER_PASSWORD,
 } from './config';
 import { createUsersLoader } from './modules/utils/usersLoader';
 import { createSupervisorsLoader } from './modules/utils/supervisorsLoader';
@@ -119,6 +122,20 @@ const main = async () => {
 			lastName: 'Master',
 			email: ADMIN_EMAIL,
 			admin: true,
+		}).save();
+	}
+
+	const testUser = await User.findOne({ nineDigitId: '0___2___0' });
+
+	if (!testUser) {
+		await User.create({
+			netId: TEST_USER_NETID,
+			nineDigitId: '0___2___0',
+			password: TEST_USER_PASSWORD,
+			firstName: 'Test',
+			lastName: 'User',
+			email: TEST_USER_EMAIL,
+			admin: false,
 		}).save();
 	}
 

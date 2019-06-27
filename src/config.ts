@@ -13,4 +13,7 @@ export const {
 	ADMIN_NETID,
 	ADMIN_EMAIL,
 	ADMIN_PASSWORD,
+	TEST_USER_NETID = 'testuser',
+	TEST_USER_EMAIL = 'test@example.com',
+	TEST_USER_PASSWORD = 'password',
 } = process.env;
