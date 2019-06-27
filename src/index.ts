@@ -18,9 +18,9 @@ import {
 	ADMIN_NETID,
 	ADMIN_EMAIL,
 	ADMIN_PASSWORD,
-	TEST_USER_EMAIL,
-	TEST_USER_NETID,
-	TEST_USER_PASSWORD,
+	// TEST_USER_EMAIL,
+	// TEST_USER_NETID,
+	// TEST_USER_PASSWORD,
 } from './config';
 import { createUsersLoader } from './modules/utils/usersLoader';
 import { createSupervisorsLoader } from './modules/utils/supervisorsLoader';
