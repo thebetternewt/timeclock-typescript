@@ -125,22 +125,22 @@ const main = async () => {
 		}).save();
 	}
 
-	await User.delete({ nineDigitId: '0___2___0' });
-	await User.delete({ netId: 'testuser' });
+	// await User.delete({ nineDigitId: '0___2___0' });
+	// await User.delete({ netId: 'testuser' });
 
-	// if (!testUser) {
-	const testUser = await User.create({
-		netId: TEST_USER_NETID,
-		nineDigitId: '0___2___0',
-		password: TEST_USER_PASSWORD,
-		firstName: 'Test',
-		lastName: 'User',
-		email: TEST_USER_EMAIL,
-		admin: false,
-	}).save();
-	// }
+	// // if (!testUser) {
+	// const testUser = await User.create({
+	// 	netId: TEST_USER_NETID,
+	// 	nineDigitId: '0___2___0',
+	// 	password: TEST_USER_PASSWORD,
+	// 	firstName: 'Test',
+	// 	lastName: 'User',
+	// 	email: TEST_USER_EMAIL,
+	// 	admin: false,
+	// }).save();
+	// // }
 
-	console.log(testUser);
+	// console.log(testUser);
 
 	return app.listen(4000, () => {
 		console.log('environment:', process.env.NODE_ENV);
