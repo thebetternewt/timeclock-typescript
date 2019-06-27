@@ -18,9 +18,9 @@ import {
 	ADMIN_NETID,
 	ADMIN_EMAIL,
 	ADMIN_PASSWORD,
-	// TEST_USER_EMAIL,
-	// TEST_USER_NETID,
-	// TEST_USER_PASSWORD,
+	TEST_USER_EMAIL,
+	TEST_USER_NETID,
+	TEST_USER_PASSWORD,
 } from './config';
 import { createUsersLoader } from './modules/utils/usersLoader';
 import { createSupervisorsLoader } from './modules/utils/supervisorsLoader';
@@ -111,36 +111,49 @@ const main = async () => {
 
 	// Check for admin user and create one with supplied config credentials if one
 	// does not already exist in the database.
-	const adminUser = await User.findOne({ admin: true });
+	let adminUser = await User.findOne({ admin: true });
 
 	if (!adminUser) {
-		await User.create({
-			netId: ADMIN_NETID,
-			nineDigitId: '0___7___0',
-			password: ADMIN_PASSWORD,
-			firstName: 'Web',
-			lastName: 'Master',
-			email: ADMIN_EMAIL,
-			admin: true,
-		}).save();
+		try {
+			adminUser = await User.create({
+				netId: ADMIN_NETID,
+				nineDigitId: '999999999',
+				password: ADMIN_PASSWORD,
+				firstName: 'Web',
+				lastName: 'Master',
+				email: ADMIN_EMAIL,
+				admin: true,
+			}).save();
+		} catch (err) {
+			console.error(err);
+		}
 	}
 
-	// await User.delete({ nineDigitId: '0___2___0' });
-	// await User.delete({ netId: 'testuser' });
+	console.log('adminUser:', adminUser);
 
-	// // if (!testUser) {
-	// const testUser = await User.create({
-	// 	netId: TEST_USER_NETID,
-	// 	nineDigitId: '0___2___0',
-	// 	password: TEST_USER_PASSWORD,
-	// 	firstName: 'Test',
-	// 	lastName: 'User',
-	// 	email: TEST_USER_EMAIL,
-	// 	admin: false,
-	// }).save();
-	// // }
+	// Check for test user and create one with supplied config credentials if one
+	// does not already exist in the database.
+	await User.delete({ netId: 'testuser' });
 
-	// console.log(testUser);
+	let testUser = await User.findOne({ nineDigitId: '000000000' });
+
+	if (!testUser) {
+		try {
+			testUser = await User.create({
+				netId: TEST_USER_NETID,
+				nineDigitId: '000000000',
+				password: TEST_USER_PASSWORD,
+				firstName: 'Test',
+				lastName: 'User',
+				email: TEST_USER_EMAIL,
+				admin: false,
+			}).save();
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	console.log('testUser:', testUser);
 
 	return app.listen(4000, () => {
 		console.log('environment:', process.env.NODE_ENV);
