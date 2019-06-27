@@ -55,8 +55,6 @@ export class ClockOutResolver {
 				0
 			);
 
-			console.log('totalMinutesUsed:', totalMinutesUsed);
-
 			// Calculate total hours from minutes
 			const totalHoursUsed = totalMinutesUsed / 60;
 

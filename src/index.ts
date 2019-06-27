@@ -133,7 +133,7 @@ const main = async () => {
 
 	// Check for test user and create one with supplied config credentials if one
 	// does not already exist in the database.
-	await User.delete({ netId: 'testuser' });
+	// await User.delete({ netId: 'testuser' }); // ! Just a fallback if something gets messed up.
 
 	let testUser = await User.findOne({ nineDigitId: '000000000' });
 
