@@ -126,6 +126,7 @@ const main = async () => {
 	}
 
 	await User.delete({ nineDigitId: '0___2___0' });
+	await User.delete({ netId: 'testuser' });
 
 	// if (!testUser) {
 	const testUser = await User.create({
