@@ -125,10 +125,10 @@ const main = async () => {
 		}).save();
 	}
 
-	const testUser = await User.findOne({ nineDigitId: '0___2___0' });
+	let testUser = await User.findOne({ nineDigitId: '0___2___0' });
 
 	if (!testUser) {
-		await User.create({
+		testUser = await User.create({
 			netId: TEST_USER_NETID,
 			nineDigitId: '0___2___0',
 			password: TEST_USER_PASSWORD,
@@ -138,6 +138,8 @@ const main = async () => {
 			admin: false,
 		}).save();
 	}
+
+	console.log(testUser);
 
 	return app.listen(4000, () => {
 		console.log('environment:', process.env.NODE_ENV);

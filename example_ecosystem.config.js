@@ -24,7 +24,7 @@ module.exports = {
 				NODE_ENV: 'production',
 				SESS_NAME: 'tsid',
 				SESS_SECRET: 'mysecret123!',
-				SESS_LIFETIME: 1000 * 60 * 2, // 2 minutes
+				SESS_LIFETIME: 1000 * 60 * 5, // 5 minutes
 				CAS_HOST: 'cas.my.university.edu',
 				CAS_SERVICE_VALIDATE: '/cas/serviceValidate',
 				CAS_LOGIN: '/cas/login',

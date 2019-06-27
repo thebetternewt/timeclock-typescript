@@ -9,7 +9,7 @@ export class MeResolver {
 	@UseMiddleware(isAuth)
 	async me(@Ctx() { req }: MyContext): Promise<User | undefined> {
 		if (!req.session!.userId) {
-			return undefined;
+			return new Promise(() => undefined);
 		}
 
 		return User.findOne(req.session!.userId);
