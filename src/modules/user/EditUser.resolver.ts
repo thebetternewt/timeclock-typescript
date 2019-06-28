@@ -48,6 +48,8 @@ export class UpdateUserResolver {
 
 		const user = await User.findOne(id);
 
+		console.log('phone:', phone);
+
 		if (!user) {
 			throw new UserInputError('User not found.');
 		}
@@ -65,26 +67,15 @@ export class UpdateUserResolver {
 		if (isAdmin) {
 			user.admin = admin;
 		}
-		if (phone) {
-			user.phone = phone;
-		}
-		if (street1) {
-			user.street1 = street1;
-		}
-		if (street2) {
-			user.street2 = street2;
-		}
-		if (city) {
-			user.city = city;
-		}
-		if (state) {
-			user.state = state;
-		}
-		if (zip) {
-			user.zip = zip;
-		}
 
-		await user.save();
+		user.phone = phone;
+		user.street1 = street1;
+		user.street2 = street2;
+		user.city = city;
+		user.state = state;
+		user.zip = zip;
+
+		const updatedUser = await user.save();
 
 		// Update dsf
 		if (dsf === true) {
@@ -93,6 +84,6 @@ export class UpdateUserResolver {
 			await Dsf.delete({ userId: id });
 		}
 
-		return user;
+		return updatedUser;
 	}
 }
