@@ -36,6 +36,8 @@ export class UpdateUserResolver {
 		}: UserInput
 	): Promise<User> {
 		const { userId, isAdmin } = req.session!;
+
+		// Prevent non-admin and non-supervisor users from editing other users.
 		if (!isAdmin) {
 			const supervisedDepartment = await UserDepartment.findOne({
 				userId,
@@ -47,6 +49,11 @@ export class UpdateUserResolver {
 		}
 
 		const user = await User.findOne(id);
+
+		// Non-admin users cannot edit admin users.
+		if (user && user.admin && !isAdmin) {
+			throw new ForbiddenError('Not authorized.');
+		}
 
 		console.log('phone:', phone);
 
