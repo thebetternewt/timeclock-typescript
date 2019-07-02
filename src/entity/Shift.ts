@@ -10,6 +10,7 @@ import {
   BeforeUpdate,
   LessThanOrEqual,
   MoreThanOrEqual,
+  IsNull,
 } from 'typeorm';
 import { Department } from './Department';
 import { User } from './User';
@@ -110,15 +111,15 @@ export class Shift extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async validateShiftTimeRange(): Promise<boolean> {
-    const shift = await Shift.findOne({
+    let shift = await Shift.findOne({
       where: [
-        // Time in is not between another shifts's time in and time out.
+        // Time in is not between another shift's time in and time out.
         {
           userId: this.userId,
           timeIn: LessThanOrEqual(this.timeIn),
           timeOut: MoreThanOrEqual(this.timeIn),
         },
-        // Time out is not between another shifts's time in and time out.
+        // Time out is not between another shift's time in and time out.
         {
           userId: this.userId,
           timeIn: LessThanOrEqual(this.timeOut),
@@ -133,8 +134,24 @@ export class Shift extends BaseEntity {
       ],
     });
 
+    // Throw error if shift is found and not current shift.
     if (shift && shift.id !== this.id) {
       throw new UserInputError('Overlapping shift already exists.');
+    }
+
+    // Find a shift for user that is still clocked in and started before the
+    // proposed timeOut.
+    shift = await Shift.findOne({
+      userId: this.userId,
+      timeIn: LessThanOrEqual(this.timeOut),
+      timeOut: IsNull(),
+    });
+
+    // Throw error if shift is found and not current shift.
+    if (shift && shift.id !== this.id) {
+      throw new UserInputError(
+        'Employee is currently clocked in. Clock employee out in order to create shifts with a future time.'
+      );
     }
 
     return true;
