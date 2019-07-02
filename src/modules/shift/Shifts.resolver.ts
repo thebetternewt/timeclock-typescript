@@ -15,7 +15,6 @@ import {
   Ctx,
 } from 'type-graphql';
 
-import { isAdmin } from '../middleware/isAdmin';
 import { isAuth } from '../middleware/isAuth';
 import { Shift } from '../../entity/Shift';
 import { ShiftInput } from './shifts/ShiftInput';
