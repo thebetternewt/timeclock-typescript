@@ -22,6 +22,7 @@ import { UserInputError, ForbiddenError } from 'apollo-server-core';
 import { isSupervisor } from '../utils/isSupervisor';
 import { isCurrentUser } from '../utils/isCurrentUser';
 import { User } from '../../entity/User';
+import { startOfMinute } from 'date-fns';
 
 @Resolver()
 export class ShiftsResolver {
@@ -75,14 +76,20 @@ export class CreateShiftResolver {
   @Mutation(() => Shift)
   async createShift(
     @Ctx() ctx: MyContext,
-    @Arg('data') data: ShiftInput
+    @Arg('data') { timeIn, timeOut, ...data }: ShiftInput
   ): Promise<Shift> {
     // Throw error if current user not admin or supervisor of shift department.
     if (!isSupervisor(ctx, data.deptId)) {
       throw new ForbiddenError('Not authorized!');
     }
 
-    return Shift.create(data).save();
+    timeIn = startOfMinute(timeIn);
+    timeOut = startOfMinute(timeOut);
+
+    console.log('in:', timeIn);
+    console.log('out:', timeOut);
+
+    return Shift.create({ timeIn, timeOut, ...data }).save();
   }
 }
 
@@ -108,8 +115,8 @@ export class UpdateShiftResolver {
       throw new UserInputError('Shift not found.');
     }
 
-    shift.timeIn = timeIn;
-    shift.timeOut = timeOut;
+    shift.timeIn = startOfMinute(timeIn);
+    shift.timeOut = startOfMinute(timeOut);
     shift.userId = userId;
     shift.deptId = deptId;
 

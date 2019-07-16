@@ -24,6 +24,9 @@ import {
   isAfter,
   getHours,
   startOfMinute,
+  subMinutes,
+  endOfMinute,
+  addMilliseconds,
 } from 'date-fns';
 import { WorkStudy } from './WorkStudy';
 
@@ -171,11 +174,11 @@ export class Shift extends BaseEntity {
   @BeforeUpdate()
   async updateMinutesElapsed(): Promise<void> {
     // Set timeIn to start of minute.
-    this.timeIn = startOfMinute(this.timeIn);
+    // this.timeIn = addMilliseconds(startOfMinute(this.timeIn), 1);
 
     if (this.timeOut) {
-      // Set timeOut to start of minute.
-      this.timeOut = startOfMinute(this.timeOut);
+      // // Set timeOut to start of minute.
+      // this.timeOut = startOfMinute(this.timeOut);
 
       const minutesElapsed = differenceInMinutes(
         parse(this.timeOut),
