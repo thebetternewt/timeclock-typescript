@@ -15,7 +15,7 @@
 		"postinstall": "$(yarn bin)/pm2 install typescript"
 	},
 	"dependencies": {
-		"apollo-server-express": "^2.4.8",
+		"apollo-server-express": "^2.14.2",
 		"bcryptjs": "^2.4.3",
 		"class-validator": "^0.9.1",
 		"connect-cas": "^1.8.1",
