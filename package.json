@@ -17,7 +17,7 @@
 	"dependencies": {
 		"apollo-server-express": "^2.4.8",
 		"bcryptjs": "^2.4.3",
-		"class-validator": "^0.9.1",
+		"class-validator": "^0.14.0",
 		"connect-cas": "^1.8.1",
 		"connect-redis": "^3.4.1",
 		"cors": "^2.8.5",
